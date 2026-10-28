@@ -15,19 +15,19 @@ raw_map = [
 s = {"grid": [list(row) for row in raw_map],
      "px":-1,
      "py":-1,
-     "battery":0,
+     "oxygen":0,
      "traps":0,
      "beam_range":4,
      "ghosts":[[-1,-1], [-1,-1]],
-     "tl":[[-1,-1,0],[-1,-1,0],[-1,-1,0],[-1,-1,-1],[-1,-1,-1]] #tl is trap locations 3rd number index: -1: not bought ---- 0 and coordinates -1,-1: owned but not placed ---- 0 and coordinates != -1,-1: on the map ---- 2: triggered
+     "tl":[] #add traps as you go on so everytime a trap is added you add a dictionary stating position and triggered status
      }
 
 
-s["battery"] = 100
+s["oxygen"] = 100
 s["traps"] = 3
 
 def show_status():
-    print(f"OxygenLevel: [{'*' * (s['battery'] // 10):10}] {s['battery']}")
+    print(f"OxygenLevel: [{'*' * (s['oxygen'] // 10):10}] {s['oxygen']}")
     print(f" Trap_Left : [{'*' * s['traps']}] {s['traps']}")
 
 for y in range(len(s["grid"])):
@@ -43,6 +43,7 @@ for row in s["grid"]:
     print("".join(row))
 show_status()
 
+trap = False
 loop = True
 print("X to exit")
 
@@ -66,8 +67,17 @@ while loop:
         target_x += 1
         valid_move = True
     elif move == "T":
-        
-        valid_move = True
+        if s["traps"] > 0:
+            if any(t["tx"] == s["px"] and t["ty"] == s["py"] for t in s["tl"]):
+                msg = "There is already a trap there"
+            else:
+                s["traps"] -= 1
+                s["oxygen"] -= 1
+                s["tl"].append({"tx": s["px"], "ty": s["py"], "triggered": False}) #inside the global dictionary you add the status of a new trap that has been placed on the map
+                msg = "Trap placed. Step off to arm it."
+                trap = True
+        else:
+            msg = "No traps left."
     elif move == "X":
         loop = False
     else:
@@ -79,19 +89,44 @@ while loop:
         continue
 
     if valid_move:
-        s["battery"] -= 1
         if s["grid"][target_y][target_x] == "#":
             msg = "Blocked by tree"
-            s["battery"] += 1
+
         elif s["grid"][target_y][target_x] == ">":
             msg = "You escaped the dark woods!"
             loop = False
+
         else:
+            if s["grid"][target_y][target_x] == "X":
+                s["traps"] += 1
+                # This is a list comprehension. It rebuilds the trap list from scratch, keeping only the traps that are NOT at target coordinates.
+                s["tl"] = [t for t in s["tl"] if not (t["tx"] == target_x and t["ty"] == target_y)]
+                msg = "Trap recovered!"
+
+            # Draw the player on the new tile
             s["grid"][target_y][target_x] = "@"
-            s["grid"][s["py"]][s["px"]] = "."
+
+            # Check if you are leaving a trap behind on your old tile
+            left_trap = False
+            for trap in s["tl"]:
+                if trap["tx"] == s["px"] and trap["ty"] == s["py"]:
+                    trap["triggered"] = True  # The trap arms when you step off
+                    left_trap = True
+
+            # Draw an X if there is a trap, otherwise draw a dirt path (.)
+            if left_trap:
+                s["grid"][s["py"]][s["px"]] = "X"
+            else:
+                s["grid"][s["py"]][s["px"]] = "."
+
+            # Update coordinates and drain oxygen
             s["px"] = target_x
             s["py"] = target_y
             msg = ""
+            s["oxygen"] -= 1
+            if s["oxygen"] == 0:
+                loop = False
+                msg = "Game Over! Ran out of Oxygen."
 
     os.system('cls' if os.name == 'nt' else 'clear')
     for row in s["grid"]:
