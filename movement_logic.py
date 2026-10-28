@@ -96,6 +96,7 @@ while loop:
     os.system('cls' if os.name == 'nt' else 'clear')
     for row in s["grid"]:
         print("".join(row))
+    show_status()
     print("X to exit")
 
     if msg:
