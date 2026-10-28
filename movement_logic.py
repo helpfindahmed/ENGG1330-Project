@@ -17,6 +17,8 @@ s = {"grid": [list(row) for row in raw_map],
      "py":-1,
      "oxygen":0,
      "traps":0,
+     "coins": 70,
+     "heat": 0,
      "beam_range":4,
      "ghosts":[[-1,-1], [-1,-1]],
      "tl":[] #add traps as you go on so everytime a trap is added you add a dictionary stating position and triggered status
@@ -27,8 +29,37 @@ s["oxygen"] = 100
 s["traps"] = 3
 
 def show_status():
-    print(f"OxygenLevel: [{'*' * (s['oxygen'] // 10):10}] {s['oxygen']}")
+    print(f"OxygenLevel: [{'*' * (s['battery'] // 10):10}] {s['battery']}")
+    print(f" CoinsLeft : [{'*' * (s['coins'] // 7):10}] {s['coins']}")
+    print(f" HeatLevel : [{'*' * (s['heat'] // 10):10}] {s['heat']}")
     print(f" Trap_Left : [{'*' * s['traps']}] {s['traps']}")
+    
+def enter_shop():
+    print("enter 1 for 20 OxygenLevel    - 40cc")
+    print("enter 2 for a trap            - 20cc")
+    print("enter 3 for lowering 20 heat  - 30cc")
+    opt = int(input())
+    if(opt == 1) and s["coins"]>=40:
+        if(s["battery"]<=80):
+            s["battery"]+=20
+        else:
+            s["battery"] = 100
+        s["coins"]-=40
+        
+    elif(opt == 2) and s["coins"]>=20:
+        s["traps"]+=1
+        s["coins"]-=20
+
+    elif(opt == 3) and s["coins"]>=30:
+        if(s["heat"]>=20):
+            s["heat"]-=20
+        else:
+            s["heat"]=0
+        s["coins"]-=30
+    elif(opt!=1)and(opt!=2)and(opt!=3):
+        print("invalid input")
+    else:
+        print("Not enough money")
 
 for y in range(len(s["grid"])):
     for x in range(len(s["grid"][y])):
@@ -78,6 +109,13 @@ while loop:
                 trap = True
         else:
             msg = "No traps left."
+    elif move == "E":
+        if (s["grid"][target_y][target_x+1] == "$") or (s["grid"][target_y][target_x-1] == "$") or (s["grid"][target_y+1][target_x] == "$") or (s["grid"][target_y-1][target_x] == "$"):
+            enter_shop()
+        else:
+            print("Please get to the shop")
+        continue
+        
     elif move == "X":
         loop = False
     else:
