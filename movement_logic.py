@@ -2,11 +2,13 @@ import os
 
 
 raw_map = [
-    "########",
-    "#@.....#",
-    "#.##...#",
-    "#....>.#",
-    "########"
+    "#######################",
+    "#@..........###.......#",
+    "#.######..............#",
+    "#.....$..#...######.###",
+    "#.....................#",
+    "#........###.....>....#",
+    "#######################"
 ]
 
 
@@ -24,6 +26,9 @@ s = {"grid": [list(row) for row in raw_map],
 s["battery"] = 100
 s["traps"] = 3
 
+def show_status():
+    print(f"OxygenLevel: [{'*' * (s['battery'] // 10):10}] {s['battery']}")
+    print(f" Trap_Left : [{'*' * s['traps']}] {s['traps']}")
 
 for y in range(len(s["grid"])):
     for x in range(len(s["grid"][y])):
@@ -36,6 +41,7 @@ for y in range(len(s["grid"])):
 os.system('cls' if os.name == 'nt' else 'clear')
 for row in s["grid"]:
     print("".join(row))
+show_status()
 
 loop = True
 print("X to exit")
@@ -76,6 +82,7 @@ while loop:
         s["battery"] -= 1
         if s["grid"][target_y][target_x] == "#":
             msg = "Blocked by tree"
+            s["battery"] += 1
         elif s["grid"][target_y][target_x] == ">":
             msg = "You escaped the dark woods!"
             loop = False
