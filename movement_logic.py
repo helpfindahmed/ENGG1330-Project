@@ -29,7 +29,7 @@ s["oxygen"] = 100
 s["traps"] = 3
 
 def show_status():
-    print(f"OxygenLevel: [{'*' * (s['battery'] // 10):10}] {s['battery']}")
+    print(f"OxygenLevel: [{'*' * (s['oxygen'] // 10):10}] {s['oxygen']}")
     print(f" CoinsLeft : [{'*' * (s['coins'] // 7):10}] {s['coins']}")
     print(f" HeatLevel : [{'*' * (s['heat'] // 10):10}] {s['heat']}")
     print(f" Trap_Left : [{'*' * s['traps']}] {s['traps']}")
@@ -40,10 +40,10 @@ def enter_shop():
     print("enter 3 for lowering 20 heat  - 30cc")
     opt = int(input())
     if(opt == 1) and s["coins"]>=40:
-        if(s["battery"]<=80):
-            s["battery"]+=20
+        if(s["oxygen"]<=80):
+            s["oxygen"]+=20
         else:
-            s["battery"] = 100
+            s["oxygen"] = 100
         s["coins"]-=40
         
     elif(opt == 2) and s["coins"]>=20:
