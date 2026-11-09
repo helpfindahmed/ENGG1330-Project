@@ -2,10 +2,10 @@ import os
 
 raw_map = [
     "#######################",
-    "#@..........###.......#",
-    "#.######..............#",
+    "#@......*...###.......#",
+    "#.######........*.....#",
     "#.....$..#...######.###",
-    "#.....................#",
+    "#..*...............*..#",
     "#........###.....>....#",
     "#######################"
 ]
@@ -348,10 +348,16 @@ while loop:
                    for i, g in enumerate(s["aliens"])):
                 draw("you walked straight into an alien genius. Game over.")
                 break
+                
             if s["grid"][target_y][target_x] == "X":
                 s["traps"] += 1
                 s["tl"] = [t for t in s["tl"] if not (t["tx"] == target_x and t["ty"] == target_y)]
                 msg = "Trap recovered!"
+
+            if s["grid"][target_y][target_x] == "*":
+                s["coins"] += 10
+                msg = "Coins gained!"
+
             s["grid"][target_y][target_x] = "@"
             left_trap = False
             for trap in s["tl"]:
