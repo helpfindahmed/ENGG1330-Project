@@ -1,4 +1,6 @@
 import os
+import sys
+from collections import deque
 
 raw_map = [
     "#######################",
@@ -256,6 +258,7 @@ s["aliens"] = [[20, 1], [14, 4]]
 draw("Escape.")
 
 loop = True
+clear_first_level=False
 while loop:
     target_x = s["px"]
     target_y = s["py"]
@@ -341,6 +344,7 @@ while loop:
         if not open_tile(target_x, target_y):
             msg = "That's a wall genius. Try the other way."
         elif s["grid"][target_y][target_x] == ">":
+            clear_first_level = True
             draw("you made it out of the dark woods. want a medal?")
             break
         else:
@@ -387,3 +391,575 @@ while loop:
         if danger:
             msg = (msg + " " + danger).strip()
     draw(msg)
+
+ship_map = [
+    "        ###############[E]#############",
+    "    ####...............................######",
+    "  ##.........................................####",
+    " #...............................................###",
+    "#...................................................##",
+    "#.......#########...........#########.................##",
+    "#.......#.......#...........#.......#..................#",
+    "#.......#...........................#...................#",
+    "#.......#########...........#########....................#",
+    "[R].................@..................................>...#",
+    "#........................................................#",
+    "#.......#########...........#########...................#",
+    "#.......#...................#..........................#",
+    "#.......#.......#...........#.......#.................##",
+    "#.......#########...........#########...............##",
+    "  ##.........................................######",
+    "    ####...............................######",
+    "        ###############[E]#############",
+]
+
+ship_map = [row.ljust(60) for row in ship_map]
+
+engine_1_map = [
+    "##############################",
+    "#............................#",
+    "#....######......######......#",
+    "#....######......######......#",
+    "#............................#",
+    "#.............C..............#",
+    "#............................#",
+    "#....######......######......#",
+    "#....######......######......#",
+    "#............................#",
+    "#............................#",
+    "##############<###############",
+]
+
+engine_2_map = [
+    "##############<###############",
+    "#............................#",
+    "#............................#",
+    "#....######......######......#",
+    "#....######......######......#",
+    "#............................#",
+    "#.............C..............#",
+    "#............................#",
+    "#....######......######......#",
+    "#....######......######......#",
+    "#............................#",
+    "##############################",
+]
+
+reactor_map = [
+    "##############################",
+    "#............................#",
+    "#......################......#",
+    "#......################......#",
+    "#............................#",
+    "#.............C..............#",
+    "#............................#",
+    "#......################......#",
+    "#......################......#",
+    "#...........................<#",
+    "#............................#",
+    "##############################",
+]
+
+
+def open_tile(x, y):
+    return (
+        0 <= y < len(s["grid"])
+        and 0 <= x < len(s["grid"][y])
+        and s["grid"][y][x] not in ("#", " ")
+    )
+
+
+def draw_level_2(msg=""):
+    os.system("cls" if os.name == "nt" else "clear")
+
+    display = [row[:] for row in s["grid"]]
+
+    if room == "ship":
+        for trap in s["tl"]:
+            display[trap["ty"]][trap["tx"]] = "X"
+
+        if enemies_active:
+            for i, (x, y) in enumerate(s["aliens"]):
+                symbol = "G" if i == 0 else "H"
+
+                if alien_stunned[i] > 0:
+                    symbol = symbol.lower()
+
+                display[y][x] = symbol
+
+    display[s["py"]][s["px"]] = "@"
+
+    print("LEVEL 2 -", room.upper())
+
+    for row in display:
+        print("".join(row))
+
+    print()
+    print("Flashlight:", s["flash"])
+    print("Traps:", s["traps"])
+    print("Engines repaired:", sum(engine_fixed.values()), "/ 2")
+
+    if stage == "repair":
+        print("Goal: repair both engines.")
+    elif stage == "escape":
+        print("Goal: check the controls at >.")
+    elif stage == "reactor":
+        print("Goal: reach the reactor room.")
+
+    print("WASD move | E interact | T trap")
+    print("FW / FA / FS / FD flashlight | X quit")
+    print("C control panel | < return to ship")
+    print("G Ghost | H Hunter | g/h stunned")
+
+    if msg:
+        print()
+        print(msg)
+
+
+def change_room(new_room, x, y):
+    global room
+
+    room = new_room
+    s["grid"] = maps[room]
+    s["px"] = x
+    s["py"] = y
+
+
+def near_tile(symbol):
+    positions = [
+        (s["px"], s["py"]),
+        (s["px"] + 1, s["py"]),
+        (s["px"] - 1, s["py"]),
+        (s["px"], s["py"] + 1),
+        (s["px"], s["py"] - 1),
+    ]
+
+    for x, y in positions:
+        if open_tile(x, y):
+            if s["grid"][y][x] == symbol:
+                return True
+
+    return False
+
+
+def hunter_goal(player):
+    if stage == "escape":
+        destination = bow_position
+    else:
+        destination = (2, 9)
+
+    path = route(player, destination)
+
+    if len(path) > 4:
+        return path[4]
+
+    if path:
+        return path[-1]
+
+    return player
+
+
+def use_panel():
+    global stage, enemies_active, level_2_clear, enemy_delay
+
+    if room in ("engine_1", "engine_2"):
+        if not near_tile("C"):
+            return "Move closer to the control panel."
+
+        if engine_fixed[room]:
+            return "This engine is already repaired."
+
+        engine_fixed[room] = True
+
+        if all(engine_fixed.values()):
+            stage = "escape"
+            enemies_active = True
+            enemy_delay = 6
+
+            return (
+                "Both engines start with a deafening roar.\n"
+                "Something climbs onto the ship.\n"
+                "The Ghost and Hunter are here!\n"
+                "Go to the controls at >."
+            )
+
+        return "Engine repaired. Find the other engine room."
+        
+
+    if room == "ship":
+        if not near_tile(">"):
+            return "There is nothing to use here."
+
+        if stage == "repair":
+            return "No power. Repair both engines first."
+
+        stage = "reactor"
+
+        return (
+            "The engines are running, but the ship cannot move.\n"
+            "The hull is damaged. The lifeboats are gone.\n"
+            "There is no way out.\n"
+            "You must destroy the ship with the creatures aboard.\n"
+            "Go to the reactor room."
+        )
+
+    if room == "reactor":
+        if not near_tile("C"):
+            return "Move closer to the control panel."
+
+        if not all(engine_fixed.values()):
+            return "Repair both engines first."
+
+        level_2_clear = True
+
+        return (
+            "You activate the ship's self-destruct system.\n"
+            "The Ghost and Hunter smash through the door.\n"
+            "A flash of light swallows everything.\n"
+            "The ship, the creatures, and you are gone.\n"
+            "THE END."
+        )
+def explosion_animation():
+    import time
+
+    frames = [
+        r"""
+                    !
+                    !
+             _______|_______
+        ____/_______________\____
+       /_________________________\
+  ~~~~~\_________________________/~~~~~
+  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+          REACTOR OVERLOAD
+        """,
+
+        r"""
+                  \ | /
+                   \|/
+             ______*_______
+        ____/_____*#*______\____
+       /_________*###*__________\
+  ~~~~~\___________*____________/~~~~~~
+  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+           CORE UNSTABLE
+        """,
+
+        r"""
+              \    |    /
+               \   |   /
+           ----- ***** -----
+              **#######**
+        ____***#########***____
+       /___**#############**___\
+  ~~~~~\_____***#######***_____/~~~~~~~
+  ~~~~~~~~~~~~~*******~~~~~~~~~~~~~~~~
+
+                BOOM!
+        """,
+
+        r"""
+        .       \  |  /        .
+             .   \ | /    .
+          *   ***#####***   *
+       .   **#############**   .
+     -----#################-----
+       .   **#############**   .
+          *   ***#####***   *
+             .   / | \    .
+        .       /  |  \        .
+
+                BOOM!
+        """,
+
+        r"""
+       #           .             /
+              *         #
+   \                  .                 *
+          .      *           /
+      #                *
+             /                  #
+  ~~~~~~~~ . ~~~~~ * ~~~~~~ . ~~~~~~~~~~
+  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+          THE SHIP BREAKS APART
+        """,
+
+        r"""
+             .                 .
+                       .
+       .           .               .
+
+                 .
+  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+                SILENCE.
+        """,
+
+        r"""
+
+
+  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+       The ship is gone.
+       The Ghost and Hunter are gone.
+       You never leave the reactor room.
+
+               THE END
+        """,
+    ]
+
+    time.sleep(1)
+
+    for i, frame in enumerate(frames):
+        os.system("cls" if os.name == "nt" else "clear")
+        print(frame, flush=True)
+
+        if i < 2:
+            time.sleep(0.8)
+        elif i < 5:
+            time.sleep(0.35)
+        else:
+            time.sleep(1.2)
+
+
+if clear_first_level:
+    maps = {
+        "ship": [list(row) for row in ship_map],
+        "engine_1": [list(row) for row in engine_1_map],
+        "engine_2": [list(row) for row in engine_2_map],
+        "reactor": [list(row) for row in reactor_map],
+    }
+
+    room = "ship"
+    stage = "repair"
+
+    engine_fixed = {
+        "engine_1": False,
+        "engine_2": False,
+    }
+
+    enemies_active = False
+    enemy_delay = 0
+    level_2_clear = False
+    return_position = (20, 9)
+
+    s["grid"] = maps["ship"]
+    s["px"] = 20
+    s["py"] = 9
+
+    s["tl"] = []
+    s["aliens"] = [[48, 4], [46, 14]]
+
+    alien_names = ["GHOST", "HUNTER"]
+    alien_stunned = [0, 0]
+    hunter_target = None
+    turn = 0
+
+    s["flash"] = max(s["flash"], 60)
+    s["traps"] = max(s["traps"], 6)
+
+    maps["ship"][9][20] = "."
+
+    for y, row in enumerate(maps["ship"]):
+        for x, tile in enumerate(row):
+            if tile == ">":
+                bow_position = (x, y)
+
+    draw_level_2(
+        "You find an abandoned ship.\n"
+        "Repair both engines and try to escape."
+    )
+
+    while not level_2_clear:
+        move = input("Enter your move: ").strip().upper()
+        move = move.replace(" ", "")
+
+        msg = ""
+        action_taken = False
+        trap_placed = False
+        changed_map = False
+
+        if move == "X":
+            break
+
+        elif move in ("W", "A", "S", "D"):
+            target_x = s["px"]
+            target_y = s["py"]
+
+            if move == "W":
+                target_y -= 1
+            elif move == "S":
+                target_y += 1
+            elif move == "A":
+                target_x -= 1
+            elif move == "D":
+                target_x += 1
+
+            if not open_tile(target_x, target_y):
+                msg = "You cannot go there."
+
+            else:
+                tile = s["grid"][target_y][target_x]
+                caught = False
+
+                if room == "ship" and enemies_active:
+                    for i, enemy in enumerate(s["aliens"]):
+                        if (
+                            enemy == [target_x, target_y]
+                            and alien_stunned[i] == 0
+                        ):
+                            caught = True
+
+                if caught:
+                    draw_level_2(
+                        "You walked straight into a creature. Game Over."
+                    )
+                    break
+
+                if room == "ship":
+                    for trap in s["tl"]:
+                        if (
+                            trap["tx"] == s["px"]
+                            and trap["ty"] == s["py"]
+                        ):
+                            trap["triggered"] = True
+
+                if room == "ship" and tile == "E":
+                    return_position = (s["px"], s["py"])
+
+                    if target_y == 0:
+                        change_room("engine_1", 14, 10)
+                    else:
+                        change_room("engine_2", 14, 1)
+
+                    changed_map = True
+                    msg = "Engine room. Find C and press E."
+
+                elif room == "ship" and tile == "R":
+                    return_position = (s["px"], s["py"])
+                    change_room("reactor", 27, 9)
+
+                    changed_map = True
+                    msg = "Reactor room. Find the control panel."
+
+                elif room != "ship" and tile == "<":
+                    change_room(
+                        "ship",
+                        return_position[0],
+                        return_position[1],
+                    )
+
+                    changed_map = True
+                    msg = "You return to the deck."
+
+                else:
+                    s["px"] = target_x
+                    s["py"] = target_y
+
+                action_taken = True
+
+        elif move == "E":
+            msg = use_panel()
+            action_taken = room == "ship"
+
+        elif move == "T":
+            if room != "ship":
+                msg = "You can only place traps on the deck."
+
+            elif s["traps"] <= 0:
+                msg = "No traps left."
+
+            elif any(
+                trap["tx"] == s["px"]
+                and trap["ty"] == s["py"]
+                for trap in s["tl"]
+            ):
+                msg = "There is already a trap here."
+
+            else:
+                s["traps"] -= 1
+
+                s["tl"].append({
+                    "tx": s["px"],
+                    "ty": s["py"],
+                    "triggered": False,
+                })
+
+                trap_placed = True
+                action_taken = True
+                msg = "Trap placed. Step off to arm it."
+
+        elif move in ("FW", "FA", "FS", "FD"):
+            if room != "ship":
+                msg = "There are no enemies in this room."
+
+            elif s["flash"] < 5:
+                msg = "Not enough flashlight battery."
+
+            else:
+                directions = {
+                    "W": (0, -1),
+                    "A": (-1, 0),
+                    "S": (0, 1),
+                    "D": (1, 0),
+                }
+
+                dx, dy = directions[move[1]]
+
+                s["flash"] -= 5
+                action_taken = True
+                msg = "Flash fired."
+
+                for step in range(1, s["beam_range"] + 1):
+                    check_x = s["px"] + dx * step
+                    check_y = s["py"] + dy * step
+
+                    if not open_tile(check_x, check_y):
+                        break
+
+                    if enemies_active:
+                        for i, enemy in enumerate(s["aliens"]):
+                            if enemy == [check_x, check_y]:
+                                alien_stunned[i] = 3
+                                msg += (
+                                    " "
+                                    + alien_names[i]
+                                    + " stunned!"
+                                )
+
+        else:
+            msg = "Invalid input."
+
+        if level_2_clear:
+            draw_level_2("You activate the reactor. There is no turning back.")
+            explosion_animation()
+            break
+
+        if (
+            action_taken
+            and room == "ship"
+            and enemies_active
+            and not changed_map
+        ):
+            if enemy_delay > 0:
+                enemy_delay -= 1
+
+            else:
+                danger = alien_turn(protected=trap_placed)
+
+                if danger == "An alien caught you. Game Over!":
+                    draw_level_2(
+                        "A creature caught you. Game Over!"
+                    )
+                    break
+
+                if danger:
+                    msg = (msg + "\n" + danger).strip()
+
+        draw_level_2(msg)
