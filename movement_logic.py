@@ -13,7 +13,7 @@ raw_map = [
 s = {"grid": [list(row) for row in raw_map],
      "px": -1,
      "py": -1,
-     "oxygen": 0,
+     "flash": 0,
      "traps": 0,
      "coins": 70,
      "heat": 0,
@@ -22,7 +22,7 @@ s = {"grid": [list(row) for row in raw_map],
      "tl": []
      }
 
-s["oxygen"] = 100
+s["flash"] = 100
 s["traps"] = 3
 
 
@@ -36,7 +36,7 @@ message = ""
 
 
 def show_status():
-    print(f"Flashlight : [{'*' * (s['oxygen'] // 10):10}] {s['oxygen']}")
+    print(f"Flashlight : [{'*' * (s['flash'] // 10):10}] {s['flash']}")
     print(f" CoinsLeft : [{'*' * (s['coins'] // 7):10}] {s['coins']}")
     print(f" HeatLevel : [{'*' * (s['heat'] // 10):10}] {s['heat']}")
     print(f" Trap_Left : [{'*' * s['traps']}] {s['traps']}")
@@ -52,10 +52,10 @@ def enter_shop():
         print("Invalid input")
         return
     if (opt == 1) and s["coins"] >= 40:
-        if s["oxygen"] <= 80:
-            s["oxygen"] += 20
+        if s["flash"] <= 80:
+            s["flash"] += 20
         else:
-            s["oxygen"] = 100
+            s["flash"] = 100
         s["coins"] -= 40
     elif (opt == 2) and s["coins"] >= 20:
         s["traps"] += 1
@@ -282,7 +282,7 @@ while loop:
                 msg = "You already placed a trap here genius."
             else:
                 s["traps"] -= 1
-                s["oxygen"] -= 1
+                s["flash"] -= 1
                 s["tl"].append({"tx": s["px"], "ty": s["py"], "triggered": False})
                 trap_placed = True
                 msg = "Trap placed. Step off to arm it."
@@ -296,6 +296,39 @@ while loop:
             msg = "Get closer to the shop first. Look for the $ sign."
         draw(msg)
         continue
+    elif len(move) == 2 and move[0] == "F":
+        direction = move[1]
+        dx = 0
+        dy = 0
+        if direction == "W":
+            dy -=1
+        elif direction == "A":
+            dx -= 1
+        elif direction == "S":
+            dy += 1
+        elif direction == "D":
+            dx += 1
+        else:
+            msg = "Invalid flash direction. Use F W, F A, F S or F D."
+            draw(msg)
+            continue
+
+        if s["flash"] < 5:
+            msg = "Not enough battery to fire flash!"
+        else:
+            s["flash"] -= 5
+            s["heat"] += 20
+            msg = "Flash fired!"
+            for step in range(1, s["beam_range"] + 1):
+                check_x = s["px"] + dx*step
+                check_y = s["py"] + dy*step
+                if not open_tile(check_x, check_y):
+                    break
+                for i, alien_pos in enumerate(s["aliens"]):
+                    if alien_pos == [check_x, check_y]:
+                        alien_stunned[i] = 3
+                        msg += f" Stunned {alien_names[i]} for 3 turns!"
+        valid_move = True
     elif move == "X":
         break
     else:
@@ -331,10 +364,10 @@ while loop:
                 s["grid"][s["py"]][s["px"]] = "."
             s["px"] = target_x
             s["py"] = target_y
-            s["oxygen"] -= 1
+            s["flash"] -= 1
             s["heat"] = min(100, s["heat"] + 2)
 
-    if s["oxygen"] <= 0:
+    if s["flash"] <= 0:
         draw("Game Over! your flashlight died.")
         break
     # alien acts on all real player actions even a blocked movement.
