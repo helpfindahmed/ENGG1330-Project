@@ -328,6 +328,8 @@ while loop:
                     if alien_pos == [check_x, check_y]:
                         alien_stunned[i] = 3
                         msg += f" Stunned {alien_names[i]} for 3 turns!"
+                        alien_stunned[0] = 3
+
         valid_move = True
     elif move == "X":
         break
