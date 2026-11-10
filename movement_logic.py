@@ -20,7 +20,7 @@ raw_map = [
 
 
 s = {"grid": [list(row) for row in raw_map],
-     "px": -1,
+     "px": -1,  
      "py": -1,
      "flash": 100,
      "battery_buys": 0,   # Tracks how many times they bought battery
