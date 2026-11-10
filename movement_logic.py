@@ -3,30 +3,34 @@ import sys
 from collections import deque
 
 raw_map = [
-    "#######################",
-    "#@......*...###.......#",
-    "#.######........*.....#",
-    "#.....$..#...######.###",
-    "#..*...............*..#",
-    "#........###.....>....#",
-    "#######################"
+    "############################################################",
+    "#@.*........*....###......*..............*.......*.......#",
+    "#...#...#....*....#....#......######.........#.......*...#",
+    "#.?.#...####...........#......#....#.........#.....*.....#",
+    "#...*...#......#########......######.........#..*........#",
+    "#####...#.*....#.*.......................*...#####.#####.#",
+    "#...*..........#.........#####...$...###.................#",
+    "#...#####......########......#.......#.#.*...*...........#",
+    "#...#.*.....*................#.......###...............>.#",
+    "#...#......#####......*......#...*............############",
+    "#.......*..#...#......*..................................#",
+    "############################################################",
 ]
+
+
 
 s = {"grid": [list(row) for row in raw_map],
      "px": -1,
      "py": -1,
-     "flash": 0,
-     "traps": 0,
-     "coins": 70,
-     "heat": 0,
+     "flash": 100,
+     "battery_buys": 0,   # Tracks how many times they bought battery
+     "bangs": 3,          # Starting Big Bang ammo
+     "traps": 3,
+     "coins": 0,
      "beam_range": 4,
-     "aliens": [[-1, -1], [-1, -1]],
+     "aliens": [[50, 2], [40, 8]],
      "tl": []
      }
-
-s["flash"] = 100
-s["traps"] = 3
-
 
 alien_names = ["ALIEN", "HUNTER"]
 alien_stunned = [0, 0]
@@ -38,35 +42,35 @@ message = ""
 
 
 def show_status():
-    print(f"Flashlight : [{'*' * (s['flash'] // 10):10}] {s['flash']}")
-    print(f" CoinsLeft : [{'*' * (s['coins'] // 7):10}] {s['coins']}")
-    print(f" HeatLevel : [{'*' * (s['heat'] // 10):10}] {s['heat']}")
-    print(f" Trap_Left : [{'*' * s['traps']}] {s['traps']}")
+    print(f" Flashlight  : {s['flash']}%")
+    print(f" Coins       : {s['coins']}")
+    print(f" Big Bangs   : {s['bangs']}")
+    print(f" Traps Left  : {s['traps']}")
 
 
 def enter_shop():
-    print("enter 1 for 20 Flashlight     - 40cc")
-    print("enter 2 for a trap            - 20cc")
-    print("enter 3 for lowering 20 heat  - 30cc")
+    # Show stock limit dynamically
+    print(f"enter 1 for +50 Battery (Bought {s['battery_buys']}/2) - 40cc")
+    print("enter 2 for 1 Trap            - 20cc")
+    print("enter 3 for 2 Big Bangs       - 30cc")
     try:
         opt = int(input())
     except ValueError:
         print("Invalid input")
         return
+
     if (opt == 1) and s["coins"] >= 40:
-        if s["flash"] <= 80:
-            s["flash"] += 20
+        if s["battery_buys"] < 2:
+            s["flash"] += 50
+            s["coins"] -= 40
+            s["battery_buys"] += 1
         else:
-            s["flash"] = 100
-        s["coins"] -= 40
+            print("Out of stock! You already bought batteries twice.")
     elif (opt == 2) and s["coins"] >= 20:
         s["traps"] += 1
         s["coins"] -= 20
     elif (opt == 3) and s["coins"] >= 30:
-        if s["heat"] >= 20:
-            s["heat"] -= 20
-        else:
-            s["heat"] = 0
+        s["bangs"] += 2
         s["coins"] -= 30
     elif opt not in (1, 2, 3):
         print("invalid input")
@@ -74,10 +78,42 @@ def enter_shop():
         print("Not enough money")
 
 
+def open_terminal():
+    os.system('cls' if os.name == 'nt' else 'clear')
+    print("SURVIVAL MANUAL (PAGE 1/2)")
+    print("-" * 40)
+    print("MISSION LOG:")
+    print("You are a space engineer. Your ship crashed in a")
+    print("dark, uncharted forest. The radar shows ship parts")
+    print("scattered nearby. You need to fix the ship to survive.")
+    print("\nCONTROLS:")
+    print("W A S D   - Move (Costs battery)")
+    print("F + Dir   - Flash Attack (e.g. F W) - Stuns enemies")
+    print("T         - Drop Trap (Step off to arm)")
+    print("E         - Interact (Read terminal, buy from shop)")
+    print("X         - Quit game")
+    input("\nPress Enter for next page > ")
+
+    os.system('cls' if os.name == 'nt' else 'clear')
+    print("SURVIVAL MANUAL (PAGE 2/2)")
+    print("-" * 40)
+    print("THREATS:")
+    print("GHOSTS (G) - Roam the forest. Avoid their paths.")
+    print("HUNTER (H) - Actively tracks you. Can cut you off.")
+    print("\nOBJECTIVES:")
+    print("1. Collect debris coins (*) to buy supplies at the shop ($).")
+    print("2. Find the exit (>) to reach your crashed ship.")
+    print("3. Repair both Engine Rooms [E] inside the ship.")
+    print("4. Access the Reactor [R] to trigger the final sequence.")
+    input("\nPress Enter to close > ")
+
+
 def open_tile(x, y):
-    return (0 <= y < len(s["grid"]) and
-            0 <= x < len(s["grid"][y]) and
-            s["grid"][y][x] != "#")
+    return (
+        0 <= y < len(s["grid"])
+        and 0 <= x < len(s["grid"][y])
+        and s["grid"][y][x] not in ("#", "?", "$", " ")
+    )
 
 
 def distance(a, b):
@@ -203,8 +239,14 @@ def alien_turn(protected=False):
     turn += 1
     warnings = []
     player = (s["px"], s["py"])
-    # sprints when far from the individual target, moves normally when nearby.
-    sprint_distance = 5
+    # GRACE PERIOD: Aliens do not move for the first 8 turns
+    if turn < 5:
+        if turn == 6:
+            return "You hear something moving in the darkness..."
+        return ""
+
+    # Sprint threshold increased so they don't rubberband to the player instantly
+    sprint_distance = 8
 
     # hunter plans its separate move first, independent of G's chase goal.
     target = hunter_goal(player)
@@ -247,6 +289,19 @@ def alien_turn(protected=False):
     return " ".join(dict.fromkeys(warnings))
 
 
+def near_tile(symbol):
+    positions = [
+        (s["px"] + 1, s["py"]),
+        (s["px"] - 1, s["py"]),
+        (s["px"], s["py"] + 1),
+        (s["px"], s["py"] - 1),
+    ]
+    for x, y in positions:
+        if 0 <= y < len(s["grid"]) and 0 <= x < len(s["grid"][y]):
+            if s["grid"][y][x] == symbol:
+                return True
+    return False
+
 for y in range(len(s["grid"])):
     for x in range(len(s["grid"][y])):
         if s["grid"][y][x] == "@":
@@ -254,7 +309,7 @@ for y in range(len(s["grid"])):
             s["px"] = x
 
 
-s["aliens"] = [[20, 1], [14, 4]]
+s["aliens"] = [[30, 8], [28, 2]]
 draw("Escape.")
 
 loop = True
@@ -291,12 +346,16 @@ while loop:
                 msg = "Trap placed. Step off to arm it."
         else:
             msg = "No traps left. you're cooked."
+
     elif move == "E":
-        if any(s["grid"][y][x] == "$" for x, y in neighbors(s["px"], s["py"])):
+        if near_tile("?"):
+            open_terminal()
+            msg = "Manual closed."
+        elif near_tile("$"):
             enter_shop()
-            msg = "shop closed brokie."
+            msg = "Left the shop."
         else:
-            msg = "Get closer to the shop first. Look for the $ sign."
+            msg = "Get closer to the shop ($) or terminal (?) first."
         draw(msg)
         continue
     elif len(move) == 2 and move[0] == "F":
@@ -316,12 +375,11 @@ while loop:
             draw(msg)
             continue
 
-        if s["flash"] < 5:
-            msg = "Not enough battery to fire flash!"
+        if s["bangs"] < 1:
+            msg = "Out of Big Bangs!"
         else:
-            s["flash"] -= 5
-            s["heat"] += 20
-            msg = "Flash fired!"
+            s["bangs"] -= 1
+            msg = "Big Bang fired!"
             for step in range(1, s["beam_range"] + 1):
                 check_x = s["px"] + dx*step
                 check_y = s["py"] + dy*step
@@ -329,11 +387,9 @@ while loop:
                     break
                 for i, alien_pos in enumerate(s["aliens"]):
                     if alien_pos == [check_x, check_y]:
-                        alien_stunned[i] = 3
-                        msg += f" Stunned {alien_names[i]} for 3 turns!"
-                        alien_stunned[0] = 3
+                        alien_stunned[i] = 5
+                        msg += f" Stunned {alien_names[i]} for 5 turns!"
 
-        valid_move = True
     elif move == "X":
         break
     else:
@@ -352,7 +408,7 @@ while loop:
                    for i, g in enumerate(s["aliens"])):
                 draw("you walked straight into an alien genius. Game over.")
                 break
-                
+
             if s["grid"][target_y][target_x] == "X":
                 s["traps"] += 1
                 s["tl"] = [t for t in s["tl"] if not (t["tx"] == target_x and t["ty"] == target_y)]
@@ -377,13 +433,12 @@ while loop:
             s["px"] = target_x
             s["py"] = target_y
             s["flash"] -= 1
-            s["heat"] = min(100, s["heat"] + 2)
 
     if s["flash"] <= 0:
         draw("Game Over! your flashlight died.")
         break
     # alien acts on all real player actions even a blocked movement.
-    if valid_move or move == "T":
+    if valid_move or move == "T" or move.startswith("F"):
         danger = alien_turn(protected=trap_placed)
         if danger == "An alien caught you. Game Over!":
             draw(danger)
@@ -461,14 +516,6 @@ reactor_map = [
 ]
 
 
-def open_tile(x, y):
-    return (
-        0 <= y < len(s["grid"])
-        and 0 <= x < len(s["grid"][y])
-        and s["grid"][y][x] not in ("#", " ")
-    )
-
-
 def draw_level_2(msg=""):
     os.system("cls" if os.name == "nt" else "clear")
 
@@ -525,22 +572,6 @@ def change_room(new_room, x, y):
     s["py"] = y
 
 
-def near_tile(symbol):
-    positions = [
-        (s["px"], s["py"]),
-        (s["px"] + 1, s["py"]),
-        (s["px"] - 1, s["py"]),
-        (s["px"], s["py"] + 1),
-        (s["px"], s["py"] - 1),
-    ]
-
-    for x, y in positions:
-        if open_tile(x, y):
-            if s["grid"][y][x] == symbol:
-                return True
-
-    return False
-
 
 def hunter_goal(player):
     if stage == "escape":
@@ -578,13 +609,14 @@ def use_panel():
 
             return (
                 "Both engines start with a deafening roar.\n"
+                "The ship's emergency lights flicker on! (Flashlight offline)\n"
                 "Something climbs onto the ship.\n"
                 "The Ghost and Hunter are here!\n"
                 "Go to the controls at >."
             )
 
         return "Engine repaired. Find the other engine room."
-        
+
 
     if room == "ship":
         if not near_tile(">"):
@@ -754,15 +786,15 @@ if clear_first_level:
     s["py"] = 9
 
     s["tl"] = []
-    s["aliens"] = [[48, 4], [46, 14]]
+    s["aliens"] = [[50, 6], [40, 8]]
 
     alien_names = ["GHOST", "HUNTER"]
     alien_stunned = [0, 0]
     hunter_target = None
     turn = 0
 
-    s["flash"] = max(s["flash"], 60)
-    s["traps"] = max(s["traps"], 6)
+    # s["flash"] = max(s["flash"], 60)
+    # s["traps"] = max(s["traps"], 6)
 
     maps["ship"][9][20] = "."
 
@@ -861,12 +893,17 @@ if clear_first_level:
                 else:
                     s["px"] = target_x
                     s["py"] = target_y
-
+                    # Only drain the flashlight if the engines are still broken
+                    if not all(engine_fixed.values()):
+                        s["flash"] -= 1
+                    else:
+                        msg = "Power restored. Lights are now switched on."
                 action_taken = True
+
 
         elif move == "E":
             msg = use_panel()
-            action_taken = room == "ship"
+            action_taken = True
 
         elif move == "T":
             if room != "ship":
@@ -895,13 +932,12 @@ if clear_first_level:
                 action_taken = True
                 msg = "Trap placed. Step off to arm it."
 
+
         elif move in ("FW", "FA", "FS", "FD"):
             if room != "ship":
                 msg = "There are no enemies in this room."
-
-            elif s["flash"] < 5:
-                msg = "Not enough flashlight battery."
-
+            elif s["bangs"] < 1:
+                msg = "Out of Big Bangs!"
             else:
                 directions = {
                     "W": (0, -1),
@@ -909,29 +945,20 @@ if clear_first_level:
                     "S": (0, 1),
                     "D": (1, 0),
                 }
-
                 dx, dy = directions[move[1]]
-
-                s["flash"] -= 5
+                s["bangs"] -= 1
                 action_taken = True
-                msg = "Flash fired."
-
+                msg = "Big Bang fired!"
                 for step in range(1, s["beam_range"] + 1):
                     check_x = s["px"] + dx * step
                     check_y = s["py"] + dy * step
-
                     if not open_tile(check_x, check_y):
                         break
-
                     if enemies_active:
                         for i, enemy in enumerate(s["aliens"]):
                             if enemy == [check_x, check_y]:
-                                alien_stunned[i] = 3
-                                msg += (
-                                    " "
-                                    + alien_names[i]
-                                    + " stunned!"
-                                )
+                                alien_stunned[i] = 5
+                                msg += f" {alien_names[i]} stunned for 5 turns!"
 
         else:
             msg = "Invalid input."
@@ -961,5 +988,11 @@ if clear_first_level:
 
                 if danger:
                     msg = (msg + "\n" + danger).strip()
+
+        if s["flash"] <= 0:
+            draw_level_2("Your flashlight died. The creatures take you in the dark. GAME OVER.")
+            break
+
+        draw_level_2(msg)
 
         draw_level_2(msg)
