@@ -2,6 +2,8 @@ import os
 import sys
 from collections import deque
 
+from engine_puzzles import IGNITION_SLOT, panel_lines, solves_panel
+
 raw_map = [
     "############################################################",
     "#@.*........*....###......*..............*.......*.......#",
@@ -103,7 +105,7 @@ def open_terminal():
     print("\nOBJECTIVES:")
     print("1. Collect debris coins (*) to buy supplies at the shop ($).")
     print("2. Find the exit (>) to reach your crashed ship.")
-    print("3. Repair both Engine Rooms [E] inside the ship.")
+    print("3. Repair Engine 1, then use its ignition slot to fix Engine 2.")
     print("4. Access the Reactor [R] to trigger the final sequence.")
     input("\nPress Enter to close > ")
 
@@ -547,7 +549,7 @@ def draw_level_2(msg=""):
     print("Engines repaired:", sum(engine_fixed.values()), "/ 2")
 
     if stage == "repair":
-        print("Goal: repair both engines.")
+        print("Goal: repair Engine 1, then Engine 2.")
     elif stage == "escape":
         print("Goal: check the controls at >.")
     elif stage == "reactor":
@@ -600,6 +602,18 @@ def use_panel():
         if engine_fixed[room]:
             return "This engine is already repaired."
 
+        if room == "engine_2" and not engine_fixed["engine_1"]:
+            return "Repair Engine 1 first to get its ignition slot."
+
+        os.system("cls" if os.name == "nt" else "clear")
+        for line in panel_lines(room):
+            print(line)
+        answer = input("Setting > ").strip()
+        if answer.upper() == "X":
+            return "Panel closed."
+        if not solves_panel(room, answer):
+            return "Setting rejected. Press E to review the clues and retry."
+
         engine_fixed[room] = True
 
         if all(engine_fixed.values()):
@@ -615,7 +629,7 @@ def use_panel():
                 "Go to the controls at >."
             )
 
-        return "Engine repaired. Find the other engine room."
+        return f"Engine 1 repaired. Ignition slot {IGNITION_SLOT} unlocks Engine 2."
 
 
     if room == "ship":
@@ -871,7 +885,7 @@ if clear_first_level:
                         change_room("engine_2", 14, 1)
 
                     changed_map = True
-                    msg = "Engine room. Find C and press E."
+                    msg = "Engine room. Stand next to C and press E."
 
                 elif room == "ship" and tile == "R":
                     return_position = (s["px"], s["py"])
