@@ -1,12 +1,11 @@
 import os
-import sys
-from collections import deque
+import textwrap
 
 from engine_puzzles import IGNITION_SLOT, panel_lines, solves_panel
 
 raw_map = [
-    "############################################################",
-    "#@.*........*....###......*..............*.......*.......#",
+    "##########################################################",
+    "#@.*........*....###......*..............*.......*...$...#",
     "#...#...#....*....#....#......######.........#.......*...#",
     "#.?.#...####...........#......#....#.........#.....*.....#",
     "#...*...#......#########......######.........#..*........#",
@@ -16,35 +15,39 @@ raw_map = [
     "#...#.*.....*................#.......###...............>.#",
     "#..........#####......*......#...*............############",
     "#...$...*..#...#......*..................................#",
-    "############################################################",
+    "##########################################################",
 ]
 
+shop_positions = {
+    (x, y)
+    for y, row in enumerate(raw_map)
+    for x, tile in enumerate(row)
+    if tile == "$"
+}
 
 
 s = {"grid": [list(row) for row in raw_map],
      "px": -1,  
      "py": -1,
      "flash": 100,
-     "battery_buys": 0,   # Tracks how many times they bought battery
-     "bangs": 3,          # Starting Big Bang ammo
+     "battery_buys": 0,
+     "bangs": 3,
      "traps": 3,
      "coins": 0,
      "beam_range": 4,
      "aliens": [[50, 2], [40, 8]],
-     "tl": []
+     "tl": [],
+     "flashlight_disabled": False,
      }
 
-alien_names = ["ALIEN", "HUNTER"]
+alien_names = ["GHOST", "HUNTER"]
 alien_stunned = [0, 0]
-alien_memory = [[-1, -1], [-1, -1]]
-last_player = (1, 1)
-hunter_target = None
 turn = 0
-message = ""
 
 
 def show_status():
-    print(f" Flashlight  : {s['flash']}%")
+    flashlight = "OFF (ship lights)" if s["flashlight_disabled"] else f"{s['flash']}%"
+    print(f" Flashlight  : {flashlight}")
     print(f" Coins       : {s['coins']}")
     print(f" Big Bangs   : {s['bangs']}")
     print(f" Traps Left  : {s['traps']}")
@@ -118,10 +121,6 @@ def open_tile(x, y):
     )
 
 
-def distance(a, b):
-    return abs(a[0] - b[0]) + abs(a[1] - b[1])
-
-
 def neighbors(x, y):
     steps = [(x + 1, y), (x - 1, y), (x, y + 1), (x, y - 1)]
     return [(a, b) for a, b in steps if open_tile(a, b)]
@@ -162,10 +161,11 @@ def draw(msg=""):
     for row in display:
         print("".join(row))
     show_status()
-    print("G = alien | H = hunter | g/h = trapped and stunned")
+    print("G = Ghost | H = Hunter | g/h = stunned")
     print("WASD move | T trap | E shop | X exit")
     if msg:
-        print(msg)
+        for line in textwrap.wrap(msg, width=78) or [""]:
+            print(line)
 
 
 def route(start, goal, blocked=()):
@@ -189,32 +189,39 @@ def route(start, goal, blocked=()):
     return path[::-1]
 
 
-def hunter_goal(player):
-    """returns the tile the Hunter should move toward to block the player"""
-    global hunter_target
-    hunter = tuple(s["aliens"][1])
-    stalker = tuple(s["aliens"][0])
-    exit_tile = (16, 5)
+def ghost_goal(player):
+    """Return a reachable tile ahead of the player to obstruct the escape route."""
+    ghost = tuple(s["aliens"][0])
+    stalker = tuple(s["aliens"][1])
+    exit_tile = next(
+        (
+            (x, y)
+            for y, row in enumerate(s["grid"])
+            for x, tile in enumerate(row)
+            if tile == ">"
+        ),
+        player,
+    )
 
     # Replan every turn: use actual wall layout and the most recent player move.
     # Aliens can cross each other, so neither obstructs the escape route.
     escape_path = route(player, exit_tile)
     if not escape_path:
-        return hunter
+        return ghost
 
     # Evaluate tiles AHEAD of the player. A good barricade is one the
-    # Hunter can reach before the player, preferably at a narrow junction.
+    # Ghost can reach before the player, preferably at a narrow junction.
     options = []
     for index, tile in enumerate(escape_path[1:], start=1):
-        time_to_block = shortest_distance(hunter, tile)
+        time_to_block = shortest_distance(ghost, tile)
         if time_to_block == 999:
             continue
         player_time = index
-        # More valuable if Hunter can beat the player to the square.
+        # More valuable if Ghost can beat the player to the square.
         arrival_penalty = max(0, time_to_block - player_time + 1) * 12
         # Prefer nearer upcoming barricades, without chasing the player.
         future_penalty = abs(index - 4) * 2
-        # Stay away from G so they're not walking together.
+        # Stay away from H so they are not walking together.
         partnership_penalty = max(0, 5 - shortest_distance(stalker, tile)) * 12
         # Narrow lanes are easier to block.
         corridor_bonus = (4 - len(neighbors(*tile))) * 3
@@ -224,41 +231,47 @@ def hunter_goal(player):
                  + partnership_penalty + exit_penalty - corridor_bonus)
         options.append((score, tile))
 
-    # If already positioned on an approaching escape tile, HOLD the line.
-    # Without this, H leaves the blocking spot and follows G around.
-    if hunter in escape_path[1:7] and shortest_distance(hunter, stalker) >= 3:
-        hunter_target = hunter
-        return hunter
+    # If already positioned on an approaching escape tile, hold the line.
+    if ghost in escape_path[1:7] and shortest_distance(ghost, stalker) >= 3:
+        return ghost
     if options:
-        hunter_target = min(options)[1]
-        return hunter_target
-    return hunter
+        return min(options)[1]
+    return ghost
+
+
+def hunter_goal(player):
+    """Return the Hunter's current reachable route target: the player."""
+    return player
 
 
 def alien_turn(protected=False):
-    """returns a warning string if the aliens are nearby, or a game-over string if caught"""
+    """Return a warning if a creature is nearby, or a game-over string if caught."""
     global turn
     turn += 1
     warnings = []
     player = (s["px"], s["py"])
-    # GRACE PERIOD: Aliens do not move for the first 8 turns
-    if turn < 5:
-        if turn == 6:
+    # Give the player eight actions before the creatures begin moving.
+    if turn <= 8:
+        if turn == 8:
             return "You hear something moving in the darkness..."
         return ""
 
     # Sprint threshold increased so they don't rubberband to the player instantly
     sprint_distance = 8
 
-    # hunter plans its separate move first, independent of G's chase goal.
     target = hunter_goal(player)
+    ghost_target = (
+        player
+        if shortest_distance(tuple(s["aliens"][0]), player) <= 1
+        else ghost_goal(player)
+    )
     for i in (0, 1):
         if alien_stunned[i] > 0:
             alien_stunned[i] -= 1
             continue
 
         here = tuple(s["aliens"][i])
-        goal = player if i == 0 else target
+        goal = ghost_target if i == 0 else target
         distance_to_goal = shortest_distance(here, goal)
         steps = 2 if distance_to_goal > sprint_distance else 1
 
@@ -270,22 +283,22 @@ def alien_turn(protected=False):
             if i == 1 and chosen == here and here == target and step == 0:
                 warnings.append("The Hunter is holding your escape route!")
 
-            # During the turn a trap is placed, aliens cannot attack.
+            # During the turn a trap is placed, creatures cannot attack.
             # They stop beside the player instead of entering their tile.
             if protected and chosen == player:
                 break
             s["aliens"][i] = list(chosen)
             if chosen == player:
-                return "An alien caught you. Game Over!"
+                return "A creature caught you. Game Over!"
             trap = trap_at(*chosen)
             if trap:
                 s["tl"].remove(trap)
                 alien_stunned[i] = 3
                 warnings.append(alien_names[i] + " walked into your trap and is stunned!")
-                break  # A trapped alien cannot finish its sprint.
+                break  # A trapped creature cannot finish its sprint.
 
     if shortest_distance(tuple(s["aliens"][0]), player) <= 2:
-        warnings.append("The alien is right behind you!")
+        warnings.append("The Ghost is right behind you!")
     if shortest_distance(tuple(s["aliens"][1]), player) <= 3:
         warnings.append("The Hunter is cutting off your path!")
     return " ".join(dict.fromkeys(warnings))
@@ -314,12 +327,12 @@ for y in range(len(s["grid"])):
 s["aliens"] = [[30, 8], [28, 2]]
 draw("Escape.")
 
-loop = True
 clear_first_level=False
-while loop:
+while True:
     target_x = s["px"]
     target_y = s["py"]
     valid_move = False
+    action_taken = False
     trap_placed = False
     msg = ""
     move = input("Enter your move: ").strip().upper()
@@ -345,6 +358,7 @@ while loop:
                 s["flash"] -= 1
                 s["tl"].append({"tx": s["px"], "ty": s["py"], "triggered": False})
                 trap_placed = True
+                action_taken = True
                 msg = "Trap placed. Step off to arm it."
         else:
             msg = "No traps left. you're cooked."
@@ -381,6 +395,7 @@ while loop:
             msg = "Out of Big Bangs!"
         else:
             s["bangs"] -= 1
+            action_taken = True
             msg = "Big Bang fired!"
             for step in range(1, s["beam_range"] + 1):
                 check_x = s["px"] + dx*step
@@ -403,12 +418,12 @@ while loop:
             msg = "That's a wall genius. Try the other way."
         elif s["grid"][target_y][target_x] == ">":
             clear_first_level = True
-            draw("you made it out of the dark woods. want a medal?")
+            draw("You made it out of the dark woods.")
             break
         else:
             if any((target_x, target_y) == tuple(g) and alien_stunned[i] == 0
                    for i, g in enumerate(s["aliens"])):
-                draw("you walked straight into an alien genius. Game over.")
+                draw("You walked straight into a creature. Game over.")
                 break
 
             if s["grid"][target_y][target_x] == "X":
@@ -428,21 +443,21 @@ while loop:
                     left_trap = True
             if left_trap:
                 s["grid"][s["py"]][s["px"]] = "X"
-            elif (s["px"], s["py"]) == (6, 3):
+            elif (s["px"], s["py"]) in shop_positions:
                 s["grid"][s["py"]][s["px"]] = "$"
             else:
                 s["grid"][s["py"]][s["px"]] = "."
             s["px"] = target_x
             s["py"] = target_y
             s["flash"] -= 1
+            action_taken = True
 
     if s["flash"] <= 0:
         draw("Game Over! your flashlight died.")
         break
-    # alien acts on all real player actions even a blocked movement.
-    if valid_move or move == "T" or move.startswith("F"):
+    if action_taken:
         danger = alien_turn(protected=trap_placed)
-        if danger == "An alien caught you. Game Over!":
+        if danger == "A creature caught you. Game Over!":
             draw(danger)
             break
         if danger:
@@ -543,7 +558,6 @@ def draw_level_2(msg=""):
     for row in display:
         print("".join(row))
 
-    print()
     print("Flashlight:", s["flash"])
     print("Traps:", s["traps"])
     print("Engines repaired:", sum(engine_fixed.values()), "/ 2")
@@ -556,13 +570,12 @@ def draw_level_2(msg=""):
         print("Goal: reach the reactor room.")
 
     print("WASD move | E interact | T trap")
-    print("FW / FA / FS / FD flashlight | X quit")
-    print("C control panel | < return to ship")
-    print("G Ghost | H Hunter | g/h stunned")
+    print("FW/FA/FS/FD flash | C panel | < return | G/H creatures | g/h stunned")
 
     if msg:
-        print()
-        print(msg)
+        for paragraph in msg.splitlines():
+            lines = textwrap.wrap(paragraph, width=78)
+            print(*(lines or [""]), sep="\n")
 
 
 def change_room(new_room, x, y):
@@ -573,23 +586,6 @@ def change_room(new_room, x, y):
     s["px"] = x
     s["py"] = y
 
-
-
-def hunter_goal(player):
-    if stage == "escape":
-        destination = bow_position
-    else:
-        destination = (2, 9)
-
-    path = route(player, destination)
-
-    if len(path) > 4:
-        return path[4]
-
-    if path:
-        return path[-1]
-
-    return player
 
 
 def use_panel():
@@ -615,6 +611,8 @@ def use_panel():
             return "Setting rejected. Press E to review the clues and retry."
 
         engine_fixed[room] = True
+        if room == "engine_1":
+            s["flashlight_disabled"] = True
 
         if all(engine_fixed.values()):
             stage = "escape"
@@ -622,14 +620,17 @@ def use_panel():
             enemy_delay = 6
 
             return (
-                "Both engines start with a deafening roar.\n"
-                "The ship's emergency lights flicker on! (Flashlight offline)\n"
-                "Something climbs onto the ship.\n"
+                "Engine 2 starts with a deafening roar, then the ship shudders.\n"
+                "A churning explosion tears through the engine room.\n"
+                "Something climbs aboard the ship.\n"
                 "The Ghost and Hunter are here!\n"
-                "Go to the controls at >."
+                "Go to the Reactor at [R]."
             )
 
-        return f"Engine 1 repaired. Ignition slot {IGNITION_SLOT} unlocks Engine 2."
+        return (
+            "Engine 1 repaired. The ship lights are back on.\n"
+            f"Ignition slot {IGNITION_SLOT} unlocks Engine 2."
+        )
 
 
     if room == "ship":
@@ -643,7 +644,7 @@ def use_panel():
 
         return (
             "The engines are running, but the ship cannot move.\n"
-            "The hull is damaged. The lifeboats are gone.\n"
+            "The hull is damaged..\n"
             "There is no way out.\n"
             "You must destroy the ship with the creatures aboard.\n"
             "Go to the reactor room."
@@ -804,23 +805,21 @@ if clear_first_level:
 
     alien_names = ["GHOST", "HUNTER"]
     alien_stunned = [0, 0]
-    hunter_target = None
     turn = 0
-
-    # s["flash"] = max(s["flash"], 60)
-    # s["traps"] = max(s["traps"], 6)
 
     maps["ship"][9][20] = "."
 
-    for y, row in enumerate(maps["ship"]):
-        for x, tile in enumerate(row):
-            if tile == ">":
-                bow_position = (x, y)
-
     draw_level_2(
-        "You find an abandoned ship.\n"
-        "Repair both engines and try to escape."
+        "You make it back to your ship.\n"
+        "The forest falls silent behind you as you reach the hull."
     )
+    input("\nPress Enter to board your ship > ")
+    draw_level_2(
+        "Inside, the ship is dark and powerless.\n"
+        "The engines are damaged, but the ship is still reparable.\n"
+        "Repair both engines and get the ship moving again."
+    )
+    input("\nPress Enter to begin repairs > ")
 
     while not level_2_clear:
         move = input("Enter your move: ").strip().upper()
@@ -907,11 +906,8 @@ if clear_first_level:
                 else:
                     s["px"] = target_x
                     s["py"] = target_y
-                    # Only drain the flashlight if the engines are still broken
-                    if not all(engine_fixed.values()):
+                    if not s["flashlight_disabled"]:
                         s["flash"] -= 1
-                    else:
-                        msg = "Power restored. Lights are now switched on."
                 action_taken = True
 
 
@@ -994,7 +990,7 @@ if clear_first_level:
             else:
                 danger = alien_turn(protected=trap_placed)
 
-                if danger == "An alien caught you. Game Over!":
+                if danger == "A creature caught you. Game Over!":
                     draw_level_2(
                         "A creature caught you. Game Over!"
                     )
@@ -1003,10 +999,8 @@ if clear_first_level:
                 if danger:
                     msg = (msg + "\n" + danger).strip()
 
-        if s["flash"] <= 0:
+        if s["flash"] <= 0 and not s["flashlight_disabled"]:
             draw_level_2("Your flashlight died. The creatures take you in the dark. GAME OVER.")
             break
-
-        draw_level_2(msg)
 
         draw_level_2(msg)
