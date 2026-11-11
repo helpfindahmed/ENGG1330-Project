@@ -507,7 +507,6 @@ def terminal_ready():
 def print_dialogue(msg, width=78, max_lines=4):
     if not msg:
         return
-    print()
     lines = []
     for paragraph in msg.splitlines():
         lines.extend(textwrap.wrap(paragraph, width=width) or [""])
@@ -966,7 +965,7 @@ def draw_level_2(msg=""):
         objective = "Check controls >"
     else:
         objective = "Activate reactor"
-    print(f"LEVEL 2 | {room_names[room]} | UPPER ENGINE:{upper} LOWER ENGINE:{lower} "
+        print(f"L2 | {room_names[room]} | U:{upper} L:{lower} "
           f"({sum(engine_fixed.values())}/2) | {objective}")
     panel = [
         f"Flash: {s['flash']}%",
