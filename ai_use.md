@@ -17,6 +17,7 @@ Generative AI used: Yes
   the parts' full names and labelled the engine rooms by deck position.
   Added persistent repair instructions on the map and let players use the
   console while standing on it or beside it.
+  Added separate upper and lower engine status labels after player feedback.
 - How results were checked: Enumerated relay orders and valve settings to
   verify each puzzle has one solution. Scripted the ship-level controls to
   test incorrect input, panel cancellation, the engine prerequisite, power

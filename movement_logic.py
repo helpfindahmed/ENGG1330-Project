@@ -571,7 +571,10 @@ def draw_level_2(msg=""):
 
     print("Flashlight:", s["flash"])
     print("Traps:", s["traps"])
-    print("Engines repaired:", sum(engine_fixed.values()), "/ 2")
+    upper = "ON" if engine_fixed["engine_1"] else "OFF"
+    lower = "ON" if engine_fixed["engine_2"] else "OFF"
+    repaired = sum(engine_fixed.values())
+    print(f"Engines repaired: {repaired} / 2 | Upper: {upper} | Lower: {lower}")
 
     if room in engine_fixed:
         if engine_fixed[room]:
