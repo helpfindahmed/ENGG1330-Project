@@ -60,7 +60,7 @@ def _intro_key(interactive, ready, size):
     return ""
 
 
-def intro_frame(text):
+def intro_frame(text, reveal=True):
     """Reveal one text frame, then wait for Enter or Backspace."""
     lines = []
     for paragraph in text.split("\n"):
@@ -73,6 +73,8 @@ def intro_frame(text):
     previous_visible = -1
     visible = 0
     total = sum(len(line) for line in lines)
+    if not reveal:
+        visible = total
     while True:
         size = intro_terminal_size()
         ready = size[0] >= 80 and size[1] >= 24
@@ -100,66 +102,75 @@ def intro_frame(text):
 
 
 
+def intro_timed_frame(lines, seconds):
+    """Show an animation frame without reflowing ASCII or scrolling."""
+    if len(lines) > 18 or any(len(line) > 72 for line in lines):
+        raise ValueError("Introduction animation exceeds its text area")
+    remaining = seconds
+    previous_size = None
+    while remaining > 0:
+        size = intro_terminal_size()
+        ready = size[0] >= 80 and size[1] >= 24
+        if size != previous_size:
+            intro_draw(lines, "", size)
+            previous_size = size
+        started = time.monotonic()
+        if sys.stdin.isatty():
+            key = _intro_key(True, ready, size)
+            if key in ("\x03", "\x04"):
+                raise KeyboardInterrupt
+        else:
+            time.sleep(0.02)
+        if ready and intro_terminal_size() == size:
+            remaining -= time.monotonic() - started
+
+
 def intro_story():
+    """Run the approved narrative, preserving Enter and Backspace navigation."""
     frames = [
-        "You are a spacecraft systems engineer. Your work takes you between "
-        "remote colonies, orbital stations and mining sites that describe "
-        "their maintenance problems as 'probably nothing.'\n\n"
-        "You fix what someone else breaks, collect your payment and leave. "
-        "Nobody has asked you to save the universe. Your rates do not cover it :(",
-        "Your next job is a regulator replacement at a distant mining colony. "
-        "The route is plotted and the engines are steady.\n\n"
-        "Then your cup slides across the console.\n\n"
-        "[NAVIGATION] UNREQUESTED COURSE CORRECTION\n\n"
-        "A second set of coordinates appears with no source identifier. "
-        "You reject it. The ship turns again.",
-        "[AUTOPILOT] CONFLICTING POSITION DATA\n"
-        "[AUTOPILOT] TRAJECTORY CORRECTION FAILED\n\n"
-        "You take manual control, but the controls go slack. A planet swells "
-        "across the space where your route should be.\n\n"
-        "[WARNING] GRAVITATIONAL CAPTURE\n\n"
-        "Below the cloud cover, forest fills the horizon.",
-        "[DESCENT] THRUST INSUFFICIENT\n\n"
-        "                 .---->\n"
-        "              .-'\n\n"
-        "       /\\       /\\   /\\       /\\\n"
-        "      /  \\ /\\ /  \\ /  \\ /\\ /  \\",
-        "[CRITICAL] EMERGENCY LANDING FAILED\n\n"
-        "                    \\ | /\n"
-        "                 --- * ---\n"
-        "                    / | \\\n"
-        "       /\\       /\\   /\\   /\\",
-        "You wake against the restraint straps. Both engines are offline.\n\n"
-        "[DIAGNOSTICS] THRUST REGULATOR DISCONNECTED\n"
-        "[DIAGNOSTICS] TAKEOFF UNAVAILABLE WITHOUT REGULATOR\n"
-        "[RADAR] POSSIBLE COMPONENT BEACON DETECTED\n\n"
-        "You take your equipment and follow the signal into the forest.",
-        "The beacon fades at the bottom of a slope. You turn to check your "
-        "way back, but the track crosses itself and stops.\n\n"
-        "A dry knock carries through the trees. The ship's marker sits at the "
-        "edge of the display, much farther away than you meant to go.",
-        "[DATABASE] PLANETARY IDENTIFICATION COMPLETE\n"
-        "[WARNING] EXTREME THREAT CLASSIFICATION\n\n"
-        "[PLANETARY RECORD] SURVEY WORLD K-17\n"
-        "[ACTIVITY] INCREASES TOWARD LOCAL NIGHTFALL\n\n"
-        "There is no safe route in the record. You are inside one of the "
-        "most dangerous habitats in the known universe.",
-        "The remaining strips of sky are losing their colour. You hear the "
-        "knock again, from a different direction.\n\n"
-        "You turn back. Repairs can wait until you have a hull between you "
-        "and the forest.\n\n"
-        "Find the way back to your ship (>). Stay clear of anything moving.",
-        "You might be wondering why you had to read all that instead of playing it.\n\n"
-        "...\n\n"
-        "Goodluck.",
+        'You are a spacecraft systems engineer. You work for a maintenance contractor that services remote mining colonies, orbital stations, and anyone else willing to pay the call-out charge.\n\nThey send you between planets to repair failing equipment, usually several months after someone decided maintenance was too expensive. \nYou fix it, sign the paperwork, and leave before anything else breaks. \nYou don’t get paid enough for this, but you do get paid. That has kept you here for six years.\n\nToday’s assignment is a mining settlement on another planet. Its ore-processing plant keeps overheating. The replacement coolant regulator is already installed. From the photographs, you can see that someone fitted it backwards.\n\nYou pack a socket adapter and accept the job. Your supervisor has allowed two hours for the repair. Travel, apparently, is something you do in your spare time.',
+        'Your ship leaves the transfer station on its assigned course. You secure your tools and check the approach instructions.\n\nHalfway through the journey, the steering thrusters fire.\n\n[NAVIGATION] COURSE CORRECTION APPLIED\n[FLIGHT PLAN] NO SCHEDULED MANOEUVRE\n\nYou bring up the route. Your destination is still listed, but the ship is steering toward a second set of coordinates.\n\nYou cancel the correction and reload the flight plan.\n\n[AUTOPILOT] POSITION SOURCES DISAPPROVED',
+        'You disconnect the autopilot and take manual control.\n\nThe thrusters respond, but the position display still keeps jumping. You cannot tell which correction made things worse.\n\nA planet fills the forward window. There is no name beside it.\n\n[WARNING] ATMOSPHERIC ENTRY IMMINENT\n[ENGINES] DESCENT RATE EXCEEDS AVAILABLE THRUST\n\nYou turn the ship upside-down and spread the remaining thrust across the descent. The vibration makes the controls difficult to hold.\n\nBelow the clouds, an enormous forest reaches to the horizon. \nYou aim for a break in the canopy and deploy the landing gear.',
+        'You wake with your weight hanging against the restraint straps.\n\nThe emergency lights are on. You release the harness, lower yourself to the tilted floor, and work through the damage report.\n\nBoth engines have shut down. The thrust regulator’s mounting has torn away, leaving an empty socket in the service bay.\n\n[DIAGNOSTICS] THRUST REGULATOR MISSING\n[TAKEOFF] UNAVAILABLE\n[RADAR] MATCHING MAINTENANCE BEACON DETECTED\n\nThe signal lies beyond the damaged trees ahead of the wreck. The regulator may have been thrown clear during the crash.\n\nYou could restore power without it but you cannot control enough thrust to lift the ship.',
+        'OBJECTIVE: FIND THE THRUST REGULATOR IN THE FOREST\nAND BRING IT BACK TO REPAIR THE SHIP.\n\nYou mark the ship on your handheld, take your equipment, and follow the bearing.\n\nThe first stretch is easy. Broken branches show where the ship came through. Beyond them, smooth trunks rise into broad fans of leaves. Warm droplets fall from the canopy long after you pass beneath it.\n\nYou follow the navigation arrow on your handheld.',
+        'Thick roots block the direct path. You walk around them and follow a shallow channel between the trees.\n\nThe ground is soft enough to leave footprints. You check behind you occasionally, making sure you can follow them back.\n\nFarther along, the regulator’s signal starts cutting out.\n\n[RADAR] CONTACT INTERMITTENT\n[ROUTE GUIDANCE] RECALCULATING\n\nYou climb out of the channel to recover the signal. When it returns, the navigation arrow points along the slope. You follow it.',
+        'You cross the slope, work around a fallen trunk, and descend through another gap in the roots.\n\nThe channel below is dry. You walk along it looking for your footprints before accepting that it is a different channel.\n\nYou request a route back to the ship.\n\n[POSITION FIX] ACCURACY LOW\n[RETURN TRACK] INCOMPLETE\n\nThe recorded trail jumps across terrain you remember going around. You retrace your last few steps, but the fallen trunk is hidden behind several others.\n\nA branch knocks against something farther down the channel. You stop to listen. It does not happen again.\nYour ship’s marker is now well beyond the edge of the local map.',
+        'For a moment, the ship link returns. A stored message arrives before you can request another position fix.\n\n[SHIP DATABASE] PLANETARY IDENTIFICATION COMPLETE\n[WORLD] K-17\n[THREAT CLASSIFICATION] EXTREME\n[EXPEDITION RECORDS] INCOMPLETE\n[FAUNA] EXCEPTIONALLY DANGEROUS SPECIES DOCUMENTED\n[ACTIVITY] INCREASES AFTER LOCAL NIGHTFALL\n[YOUR POSITION] WITHIN RECORDED HABITAT\n[RECOMMENDATION] RETURN TO SHELTER',
+        'You open the attached survey. Most of its entries contain coordinates and missing reports. There is no marked safe route.\n\nThe database had flagged a possible match earlier. It only released the warning once it confirmed the planet.\n\nYou would have preferred a less reliable warning earlier.',
+        'Above the canopy, the patches of sky are turning grey.\n\nThe regulator’s signal appears once more, then drops out. You put away the search bearing.\n\nThe ship is damaged, but its hatch still closes. Whatever repairs it needs, you need to reach it before nightfall.\n\nYou turn toward its last recorded position. A wall of roots blocks the direct route, and the handheld offers no useful way around it.\n\nYou will have to find your own path.\n\nYour immediate objective is to survive the forest and reach your crashed spacecraft. Find your way back to the ship (>).',
+    ]
+    crash_frames = [
+        ['[LANDING GEAR] DEPLOYMENT INCOMPLETE', '', '  +------------------------------------------------------+', '  |                                                      |', '  |                         /\\                           |', '  |           /\\           /  \\        /\\                |', '  |     /\\   /  \\    /\\    /    \\      /  \\       /\\       |', '  |____/  \\_/    \\__/  \\__/      \\____/    \\_____/  \\______|', '  |                                                      |', '  +------------------------------------------------------+', '', '[DESCENT] PULL UP'],
+        ['[WARNING] TERRAIN COLLISION', '', '   +------------------------------------------------------+', '   |       /       \\            /        \\                |', '   |      /         \\          /          \\      /        |', '   |_____/           \\________/            \\____/         |', '   |           ||                    ||              ||   |', '   |     ------||-----         ------||------        ||   |', '   |           ||                    ||              ||   |', '   +------------------------------------------------------+', '', '[ENGINES] EMERGENCY SHUTDOWN'],
+        ['[CRITICAL] IMPACT DETECTED', '', '  +------------------------------------------------------+', '  |          \\                    /                      |', '  |           \\       |          /                       |', '  |------------\\------*---------/-------------------------|', '  |             \\   / | \\     /                          |', '  |              \\ /  |  \\___/                           |', '  |               /   |      \\                           |', '  +------------------------------------------------------+', '', '[FLIGHT RECORDER] SIGNAL L—'],
     ]
     index = 0
     while index < len(frames):
-        result = intro_frame(frames[index])
+        if index == 3:
+            for lines, delay in zip(crash_frames, (0.2, 0.2, 0.15)):
+                intro_timed_frame(lines, delay)
+            intro_timed_frame([], 0.45)
+        if index == 7:
+            lead, notices = frames[index].split("\n\n", 1)
+            lines = textwrap.wrap(lead, width=72) + [""]
+            intro_timed_frame(lines, 1.0)
+            for notice in notices.splitlines():
+                lines.append(notice)
+                intro_timed_frame(lines, 0.8)
+            result = intro_frame(frames[index], reveal=False)
+        else:
+            result = intro_frame(frames[index])
         if result == "back":
             index = max(0, index - 1)
         else:
             index += 1
+
+    joke = textwrap.wrap(
+        "You might be wondering why we narrated all of that instead "
+        "of letting you play through it.", width=72)
+    intro_timed_frame(joke, 2.0)
+    intro_timed_frame(joke + ["", "…"], 1.0)
+    intro_timed_frame(joke + ["", "…", "", "Goodluck."], 1.0)
 
 
 def play_introduction():
@@ -346,8 +357,8 @@ raw_map = [
     "#.?.#...####...........#......#....#.........#.....*.....#",
     "#...*...#......#########......######.........#..*........#",
     "#####...#.*....#.*.......................*...#####.#####.#",
-    "#...*..........#.........#####.......###.................#",
-    "#...#####......########......#.......#.#.*...*...........#",
+    "#...*..........#.........#####.......###.............#...#",
+    "#...#####......########......#.......#.#.*...*.......#...#",
     "#...#.*.....*................#.......###...............>.#",
     "#..........#####......*......#...*............############",
     "#...$...*..#...#......*..................................#",
@@ -526,7 +537,7 @@ def draw(msg=""):
     ]
     for index, row in enumerate(display):
         side = panel[index] if index < len(panel) else ""
-        print(f"{''.join(row):<60} {side:<19}")
+        print(f"{''.join(row).replace('.', ' '):<60} {side:<19}")
     print_dialogue(msg)
 
 
@@ -619,8 +630,6 @@ def alien_turn(protected=False, aggressive=False):
             return "You hear something moving in the darkness..."
         return ""
 
-    sprint_distance = 12 if aggressive else 8
-
     target = hunter_goal(player)
     ghost_target = (
         player
@@ -634,8 +643,9 @@ def alien_turn(protected=False, aggressive=False):
 
         here = tuple(s["aliens"][i])
         goal = ghost_target if i == 0 else target
-        distance_to_goal = shortest_distance(here, goal)
-        steps = 2 if aggressive or distance_to_goal > sprint_distance else 1
+        distance_to_player = shortest_distance(here, player)
+        sprint_limit = 4 if i == 0 else 8
+        steps = 2 if distance_to_player > sprint_limit else 1
 
         for step in range(steps):
             here = tuple(s["aliens"][i])
@@ -695,7 +705,7 @@ elif debug_mode == "forest":
     time.sleep(0.5)
 
 if debug_mode != "ship":
-    draw("Escape.")
+    draw("Move beside ? and press E for help. Press H to reopen it afterward.")
 
 clear_first_level = debug_mode == "ship"
 while debug_mode != "ship":
@@ -832,6 +842,8 @@ while debug_mode != "ship":
             s["py"] = target_y
             s["flash"] -= 1
             action_taken = True
+            if not msg and near_tile("$"):
+                msg = "A mysterious store stands in the middle of the forest."
 
     if s["flash"] <= 0:
         draw("Game Over! your flashlight died.")
@@ -965,7 +977,7 @@ def draw_level_2(msg=""):
     ]
     for index, row in enumerate(display):
         side = panel[index] if index < len(panel) else ""
-        print(f"{''.join(row):<60} {side:<19}")
+        print(f"{''.join(row).replace('.', ' '):<60} {side:<19}")
     print_dialogue(msg)
 
 
