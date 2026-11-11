@@ -11,11 +11,15 @@ def panel_lines(room):
         return (
             "ENGINE 1 | ROUTE THE POWER",
             "",
-            "Put C (coolant), I (ignition) and P (pump) in order.",
+            "Fit one relay into each slot.",
+            "Slots    [1 ___]  [2 ___]  [3 ___]",
+            "Relays   [P] Pump   [C] Coolant   [I] Ignition",
+            "",
             "Coolant comes before the pump.",
             "The pump comes immediately after ignition.",
             "",
-            "Enter the three letters in order. X closes the panel.",
+            "Type the three relay letters from slot 1 to slot 3.",
+            "Spaces are optional. X closes the panel.",
         )
     return (
         "ENGINE 2 | BALANCE THE FUEL",
