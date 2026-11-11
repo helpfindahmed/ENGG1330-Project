@@ -16,6 +16,7 @@ Generative AI used: Yes
   After player feedback, labelled the engine rooms by deck position and
   asked players to enter the three part numbers in order. Added retries
   inside both panels and explicit repair confirmation before returning.
+  Added progressive hints that become more specific after wrong answers.
   Added persistent repair instructions on the map and let players use the
   console while standing on it or beside it.
   Added separate upper and lower engine status labels after player feedback.

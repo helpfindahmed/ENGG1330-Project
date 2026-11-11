@@ -1,7 +1,7 @@
 import os
 import textwrap
 
-from engine_puzzles import IGNITION_SLOT, panel_lines, solves_panel
+from engine_puzzles import IGNITION_SLOT, PANEL_HINTS, panel_lines, solves_panel
 from turn_input import read_turn
 
 raw_map = [
@@ -625,19 +625,21 @@ def use_panel():
         if room == "engine_2" and not engine_fixed["engine_1"]:
             return "Repair the upper engine first to get its starter position."
 
-        feedback = ""
+        hints = PANEL_HINTS[room]
         while True:
             os.system("cls" if os.name == "nt" else "clear")
             for line in panel_lines(room):
                 print(line)
-            if feedback:
-                print(feedback)
+            if engine_attempts[room]:
+                hint_number = min(engine_attempts[room], len(hints))
+                print("Incorrect setting. Check the clues and try again.")
+                print(f"Hint {hint_number}/{len(hints)}: {hints[hint_number - 1]}")
             answer = input("Setting > ").strip()
             if answer.upper() == "X":
                 return "Panel closed."
             if solves_panel(room, answer):
                 break
-            feedback = "Incorrect setting. Check the clues and try again."
+            engine_attempts[room] += 1
 
         if room == "engine_1":
             print(f"Correct! Upper engine repaired. Starter position: {IGNITION_SLOT}.")
@@ -825,6 +827,7 @@ if clear_first_level:
         "engine_1": False,
         "engine_2": False,
     }
+    engine_attempts = dict.fromkeys(engine_fixed, 0)
 
     enemies_active = False
     enemy_delay = 0

@@ -4,6 +4,21 @@ RELAY_ORDER = "231"
 IGNITION_SLOT = RELAY_ORDER.index("3") + 1
 FUEL_TOTAL = 9
 
+PANEL_HINTS = {
+    "engine_1": (
+        "Treat the starter and fuel pump as a pair that stays together.",
+        "If the pair takes slots 1 and 2, can cooling go before the pump?",
+        "The starter and fuel pump belong in slots 2 and 3.",
+        "Put cooling first. Use the part numbers on the panel for your answer.",
+    ),
+    "engine_2": (
+        "Start with C, which is fixed by the upper engine.",
+        "Subtract C from the total to find how much A and B share.",
+        f"A and B add up to {FUEL_TOTAL - IGNITION_SLOT}. B is one higher than A.",
+        "Split that sum into consecutive numbers. Put the smaller one in A.",
+    ),
+}
+
 
 def panel_lines(room):
     """Return the clues shown on an engine's repair screen."""
