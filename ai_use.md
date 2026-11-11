@@ -15,8 +15,11 @@ Generative AI used: Yes
   ship maps, flashlight carryover, enemy activation and reactor ending.
   After player feedback, displayed the first puzzle as numbered choices with
   the parts' full names and labelled the engine rooms by deck position.
+  Added persistent repair instructions on the map and let players use the
+  console while standing on it or beside it.
 - How results were checked: Enumerated relay orders and valve settings to
   verify each puzzle has one solution. Scripted the ship-level controls to
   test incorrect input, panel cancellation, the engine prerequisite, power
-  restoration, and reaching the reactor ending. Checked both panel sizes
+  restoration, and reaching the reactor ending. Tested the map hints and both
+  console positions. Checked both panel sizes
   against 80 by 24. The full game and course container still need verification.

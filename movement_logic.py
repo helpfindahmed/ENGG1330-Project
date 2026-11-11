@@ -533,6 +533,10 @@ reactor_map = [
 ]
 
 
+def at_engine_panel():
+    return s["grid"][s["py"]][s["px"]] == "C" or near_tile("C")
+
+
 def draw_level_2(msg=""):
     os.system("cls" if os.name == "nt" else "clear")
 
@@ -568,8 +572,18 @@ def draw_level_2(msg=""):
     print("Traps:", s["traps"])
     print("Engines repaired:", sum(engine_fixed.values()), "/ 2")
 
-    if stage == "repair":
-        print("Goal: upper [E] first, then lower [E].")
+    if room in engine_fixed:
+        if engine_fixed[room]:
+            print("Engine repaired. Walk to < to return to the main deck.")
+        elif room == "engine_2" and not engine_fixed["engine_1"]:
+            print("Lower engine locked. Go back via < and repair the upper engine.")
+        elif at_engine_panel():
+            print("At the repair panel. Press E to start the puzzle.")
+        else:
+            print("Find C. Stand on it or next to it, then press E to repair.")
+    elif stage == "repair":
+        next_engine = "lower" if engine_fixed["engine_1"] else "upper"
+        print(f"Goal: enter the {next_engine} [E] engine room.")
     elif stage == "escape":
         print("Goal: check the controls at >.")
     elif stage == "reactor":
@@ -597,9 +611,9 @@ def change_room(new_room, x, y):
 def use_panel():
     global stage, enemies_active, level_2_clear, enemy_delay
 
-    if room in ("engine_1", "engine_2"):
-        if not near_tile("C"):
-            return "Move closer to the control panel."
+    if room in engine_fixed:
+        if not at_engine_panel():
+            return "Walk to C or a tile beside it, then press E."
 
         if engine_fixed[room]:
             return "This engine is already repaired."
@@ -890,7 +904,6 @@ if clear_first_level:
                         change_room("engine_2", 14, 1)
 
                     changed_map = True
-                    msg = "Engine room. Stand next to C and press E."
 
                 elif room == "ship" and tile == "R":
                     return_position = (s["px"], s["py"])
