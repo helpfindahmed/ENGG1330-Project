@@ -10,6 +10,7 @@ def main():
     while True:
         print(f"Turn {turn} | player x={x} | enemy turns={turn} | player y={y}")
         command = read_turn("Move [WASD | F + direction | E | T | X] > ")
+        print()
         if command == "X":
             break
         if command == "E":

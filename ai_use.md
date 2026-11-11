@@ -25,7 +25,7 @@ Generative AI used: Yes
   test incorrect input, panel cancellation, the engine prerequisite, power
   restoration, and reaching the reactor ending. Tested the map hints and both
   console positions. Checked both panel sizes
-  against 80 by 24. The full game and course container still need verification.
+  against 80 by 24. See the later entry for the course container replay.
 
 ## Entry
 
@@ -54,3 +54,16 @@ Generative AI used: Yes
   reopen behavior, and flashlight drain before and after the first repair.
   Checked Windows command handling with simulated console input. A native
   Windows console test remains pending.
+
+## Entry
+
+- Member and date: Hongkang Liu, 11 November 2026.
+- Tool and model/version: OpenAI Codex. Exact model version was not recorded.
+- Purpose: Fix issues found in the pre-push review.
+- Substantial parts affected: The ship display in `movement_logic.py`, the
+  upper engine hint in `engine_puzzles.py`, and Escape handling in
+  `turn_input.py`.
+- How results were checked: Replayed both engine repairs, boarding enemies
+  and the reactor ending on macOS and in the offline course Docker image.
+  Checked all 115 ship map frames against 80 by 24. Verified on macOS that
+  a move typed immediately after Escape still advances one turn.

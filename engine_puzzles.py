@@ -9,7 +9,7 @@ PANEL_HINTS = {
         "Treat the starter and fuel pump as a pair that stays together.",
         "If the pair takes slots 1 and 2, can cooling go before the pump?",
         "The starter and fuel pump belong in slots 2 and 3.",
-        "Put cooling first. Use the part numbers on the panel for your answer.",
+        "Put cooling first, then enter the three part numbers.",
     ),
     "engine_2": (
         "Start with C, which is fixed by the upper engine.",

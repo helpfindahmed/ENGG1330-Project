@@ -48,8 +48,12 @@ def read_turn(prompt="Move [WASD | F + direction | E | T | H | X] > "):
     fd = sys.stdin.fileno()
     original = termios.tcgetattr(fd)
 
+    pending_key = b""
+
     def read_key():
-        key = os.read(fd, 1)
+        nonlocal pending_key
+        key = pending_key or os.read(fd, 1)
+        pending_key = b""
         if key != b"\x1b":
             return key.decode("ascii", errors="replace").upper()
 
@@ -62,6 +66,8 @@ def read_turn(prompt="Move [WASD | F + direction | E | T | H | X] > "):
                     part = os.read(fd, 1)
                     if not part or b"@" <= part <= b"~":
                         break
+            else:
+                pending_key = prefix
         return "\x1b"
 
     try:

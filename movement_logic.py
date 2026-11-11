@@ -392,9 +392,6 @@ def terminal_ready():
 
 
 def print_dialogue(msg, width=78, max_lines=4):
-    if not msg:
-        return
-    print()
     lines = []
     for paragraph in msg.splitlines():
         lines.extend(textwrap.wrap(paragraph, width=width) or [""])
@@ -425,7 +422,9 @@ def draw(msg=""):
     for index, row in enumerate(display):
         side = panel[index] if index < len(panel) else ""
         print(f"{''.join(row):<60} {side:<19}")
-    print_dialogue(msg)
+    if msg:
+        print()
+        print_dialogue(msg)
 
 
 def route(start, goal, blocked=()):
@@ -852,8 +851,7 @@ def draw_level_2(msg=""):
         objective = "Check controls >"
     else:
         objective = "Activate reactor"
-    print(f"LEVEL 2 | {room_names[room]} | UPPER ENGINE:{upper} LOWER ENGINE:{lower} "
-          f"({sum(engine_fixed.values())}/2) | {objective}")
+    print(f"LEVEL 2 | {room_names[room]} | Upper: {upper} | Lower: {lower} | {objective}")
     panel = [
         f"Flash: {s['flash']}%",
         f"Traps: {s['traps']}",
@@ -863,7 +861,7 @@ def draw_level_2(msg=""):
     ]
     for index, row in enumerate(display):
         side = panel[index] if index < len(panel) else ""
-        print(f"{''.join(row):<60} {side:<19}")
+        print(f"{''.join(row):<60} {side}".rstrip())
     print_dialogue(msg)
 
 
@@ -1125,13 +1123,13 @@ if clear_first_level:
         "You make it back to your ship.\n"
         "The forest falls silent behind you as you reach the hull."
     )
-    input("\nPress Enter to board your ship > ")
+    input("Press Enter to board your ship > ")
     draw_level_2(
         "Inside, the ship is dark and powerless.\n"
         "The engines are damaged, but the ship is still reparable.\n"
         "Repair both engines and get the ship moving again."
     )
-    input("\nPress Enter to begin repairs > ")
+    input("Press Enter to begin repairs > ")
 
     while not level_2_clear:
         move = read_turn()
