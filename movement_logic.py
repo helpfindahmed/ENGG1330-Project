@@ -395,6 +395,7 @@ help_unlocked = False
 
 def enter_shop():
     # Show stock limit dynamically
+    print()
     print(f"enter 1 for +50 Battery (Bought {s['battery_buys']}/2) - 40cc")
     print("enter 2 for 1 Trap            - 20cc")
     print("enter 3 for 2 Big Bangs       - 30cc")
