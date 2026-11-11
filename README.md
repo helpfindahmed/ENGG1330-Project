@@ -29,7 +29,7 @@ You cannot simply hold 'D' and sprint to the exit. If the aliens are within 8 ti
 Every step you take drains your Flashlight battery. If it hits 0, you die.
 *   Level Carry-Over: Your battery, Big Bangs, and Traps carry over directly from the forest into the Level 2 Ship. If you rush the exit without gathering resources, you will mathematically run out of battery while fixing the ship's engines.
 *   Debris Coins (*): You MUST explore the dangerous clearings to collect coins.
-*   The Shop ($): Placed in opposite corners of the map. It acts as a high-risk rest stop. You have to push bback into the corner of the maze to buy supplies, giving the aliens a chance to corner you. Maneuvering through requires proper thought and strategy.
+*   The Shop ($): Placed in opposite corners of the map. It acts as a high-risk rest stop. You have to push back into the corner of the maze to buy supplies, giving the aliens a chance to corner you. Maneuvering through requires proper thought and strategy.
 
 ------------------------------------------------------
 4. COMBAT & DEFENSE
@@ -43,6 +43,6 @@ You have two primary defensive tools. Use them efficiently, as resources are str
 ------------------------------------------------------
 Once you reach the exit (>), you enter the crashed ship.
 *   Your goal is to reach both Engine Rooms [E] and interact with the Control Panels (C).
-*   Your flashlight will continue to drain until BOTH engines are online. Move with purpose.
-*   Once the engines fire, the emergency lights come on (stopping battery drain), but the Ghost and Hunter board the ship. You must navigate the tight corridors, dodge the aliens, and reach the Reactor [R] to initiate the self-destruct sequence.
+*   Your flashlight will continue to drain until one of the engines is online. Move with purpose.
+*   Once the engine fires, the emergency lights come on (stopping battery drain), and once both the engines are on the Ghost and Hunter board the ship. You must navigate the tight corridors, dodge the aliens, and reach the Reactor [R] to initiate the self-destruct sequence.
 
