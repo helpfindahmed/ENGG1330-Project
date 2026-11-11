@@ -13,8 +13,9 @@ Generative AI used: Yes
 - What was kept, changed, or rejected: Added relay ordering for Engine 1 and
   used its ignition slot as a fuel valve clue for Engine 2. Kept the team's
   ship maps, flashlight carryover, enemy activation and reactor ending.
-  After player feedback, displayed the first puzzle as numbered choices with
-  the parts' full names and labelled the engine rooms by deck position.
+  After player feedback, labelled the engine rooms by deck position and
+  asked players to enter the three part numbers in order. Added retries
+  inside both panels and explicit repair confirmation before returning.
   Added persistent repair instructions on the map and let players use the
   console while standing on it or beside it.
   Added separate upper and lower engine status labels after player feedback.

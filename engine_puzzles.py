@@ -1,10 +1,8 @@
 """Clues and solution checks for the ship's linked engine puzzles."""
 
-RELAY_ORDER = "CIP"
-IGNITION_SLOT = RELAY_ORDER.index("I") + 1
+RELAY_ORDER = "231"
+IGNITION_SLOT = RELAY_ORDER.index("3") + 1
 FUEL_TOTAL = 9
-RELAY_NAMES = {"C": "Cooling system", "I": "Starter", "P": "Fuel pump"}
-RELAY_CHOICES = ("IPC", "CPI", "PCI", "CIP", "PIC", "ICP")
 
 
 def panel_lines(room):
@@ -13,16 +11,16 @@ def panel_lines(room):
         return (
             "UPPER ENGINE | CONNECT THE PARTS",
             "",
-            "Choose the order for the three parts.",
+            "Connect all three parts in the correct order.",
+            "1. Fuel pump",
+            "2. Cooling system",
+            "3. Starter",
+            "",
             "The cooling system goes before the fuel pump.",
             "The fuel pump goes immediately after the starter.",
             "",
-            *(
-                f"{number}. " + " -> ".join(RELAY_NAMES[part] for part in order)
-                for number, order in enumerate(RELAY_CHOICES, start=1)
-            ),
-            "",
-            "Type an option number and press Enter. X closes the panel.",
+            "Enter the three part numbers in order, using each once.",
+            "Press Enter to submit. X closes the panel.",
         )
     return (
         "LOWER ENGINE | BALANCE THE FUEL",
@@ -40,8 +38,6 @@ def solves_panel(room, answer):
     """Check a relay order or a set of fuel valve settings."""
     compact = "".join(answer.upper().split())
     if room == "engine_1":
-        if len(compact) == 1 and compact in "123456":
-            compact = RELAY_CHOICES[int(compact) - 1]
         return compact == RELAY_ORDER
     if len(compact) != 3 or any(digit not in "12345" for digit in compact):
         return False

@@ -625,14 +625,25 @@ def use_panel():
         if room == "engine_2" and not engine_fixed["engine_1"]:
             return "Repair the upper engine first to get its starter position."
 
-        os.system("cls" if os.name == "nt" else "clear")
-        for line in panel_lines(room):
-            print(line)
-        answer = input("Setting > ").strip()
-        if answer.upper() == "X":
-            return "Panel closed."
-        if not solves_panel(room, answer):
-            return "Setting rejected. Press E to review the clues and retry."
+        feedback = ""
+        while True:
+            os.system("cls" if os.name == "nt" else "clear")
+            for line in panel_lines(room):
+                print(line)
+            if feedback:
+                print(feedback)
+            answer = input("Setting > ").strip()
+            if answer.upper() == "X":
+                return "Panel closed."
+            if solves_panel(room, answer):
+                break
+            feedback = "Incorrect setting. Check the clues and try again."
+
+        if room == "engine_1":
+            print(f"Correct! Upper engine repaired. Starter position: {IGNITION_SLOT}.")
+        else:
+            print("Correct! Lower engine repaired. Both engines are on.")
+        input("\nPress Enter to return to the map > ")
 
         engine_fixed[room] = True
         if room == "engine_1":
