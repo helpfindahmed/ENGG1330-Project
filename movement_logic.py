@@ -2,6 +2,7 @@ import os
 import textwrap
 
 from engine_puzzles import IGNITION_SLOT, panel_lines, solves_panel
+from turn_input import read_turn
 
 raw_map = [
     "##########################################################",
@@ -92,8 +93,8 @@ def open_terminal():
     print("dark, uncharted forest. The radar shows ship parts")
     print("scattered nearby. You need to fix the ship to survive.")
     print("\nCONTROLS:")
-    print("W A S D   - Move (Costs battery)")
-    print("F + Dir   - Flash Attack (e.g. F W) - Stuns enemies")
+    print("W A S D   - Move one tile per keypress (Costs battery)")
+    print("F then WASD - Aim a flash attack to stun enemies")
     print("T         - Drop Trap (Step off to arm)")
     print("E         - Interact (Read terminal, buy from shop)")
     print("X         - Quit game")
@@ -335,7 +336,7 @@ while True:
     action_taken = False
     trap_placed = False
     msg = ""
-    move = input("Enter your move: ").strip().upper()
+    move = read_turn()
 
     if move == "W":
         target_y -= 1
@@ -842,7 +843,7 @@ if clear_first_level:
     input("\nPress Enter to begin repairs > ")
 
     while not level_2_clear:
-        move = input("Enter your move: ").strip().upper()
+        move = read_turn()
         move = move.replace(" ", "")
 
         msg = ""

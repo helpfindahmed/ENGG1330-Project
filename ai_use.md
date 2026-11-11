@@ -23,3 +23,16 @@ Generative AI used: Yes
   restoration, and reaching the reactor ending. Tested the map hints and both
   console positions. Checked both panel sizes
   against 80 by 24. The full game and course container still need verification.
+
+## Entry
+
+- Member and date: Hongkang Liu, 11 November 2026.
+- Tool and model/version: OpenAI Codex. Exact model version was not recorded.
+- Purpose: Prototype direct WASD input and integrate it after testing.
+- Substantial parts affected: `direct_wasd_demo.py`, `turn_input.py` and the
+  movement input in `movement_logic.py`.
+- What was kept and how it was checked: Movement and flash attacks advance
+  one command at a time. Text prompts still submit with Enter. Tested the
+  separate demo in a macOS terminal session before integrating it. Replayed
+  forest controls and both ship repairs through the new input and checked
+  terminal restoration on exit and interruption.
