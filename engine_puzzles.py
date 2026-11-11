@@ -3,30 +3,33 @@
 RELAY_ORDER = "CIP"
 IGNITION_SLOT = RELAY_ORDER.index("I") + 1
 FUEL_TOTAL = 9
+RELAY_NAMES = {"C": "Cooling system", "I": "Starter", "P": "Fuel pump"}
+RELAY_CHOICES = ("IPC", "CPI", "PCI", "CIP", "PIC", "ICP")
 
 
 def panel_lines(room):
     """Return the clues shown on an engine's repair screen."""
     if room == "engine_1":
         return (
-            "ENGINE 1 | ROUTE THE POWER",
+            "UPPER ENGINE | CONNECT THE PARTS",
             "",
-            "Fit one relay into each slot.",
-            "Slots    [1 ___]  [2 ___]  [3 ___]",
-            "Relays   [P] Pump   [C] Coolant   [I] Ignition",
+            "Choose the order for the three parts.",
+            "The cooling system goes before the fuel pump.",
+            "The fuel pump goes immediately after the starter.",
             "",
-            "Coolant comes before the pump.",
-            "The pump comes immediately after ignition.",
+            *(
+                f"{number}. " + " -> ".join(RELAY_NAMES[part] for part in order)
+                for number, order in enumerate(RELAY_CHOICES, start=1)
+            ),
             "",
-            "Type the three relay letters from slot 1 to slot 3.",
-            "Spaces are optional. X closes the panel.",
+            "Type an option number and press Enter. X closes the panel.",
         )
     return (
-        "ENGINE 2 | BALANCE THE FUEL",
+        "LOWER ENGINE | BALANCE THE FUEL",
         "",
         "Set fuel valves A, B and C to whole numbers from 1 to 5.",
         "B needs one more unit than A.",
-        f"C must match Engine 1's ignition slot ({IGNITION_SLOT}).",
+        f"C must match the upper engine's starter position ({IGNITION_SLOT}).",
         f"The three valves must total {FUEL_TOTAL} units.",
         "",
         "Enter the three numbers in A B C order. X closes the panel.",
@@ -37,6 +40,8 @@ def solves_panel(room, answer):
     """Check a relay order or a set of fuel valve settings."""
     compact = "".join(answer.upper().split())
     if room == "engine_1":
+        if len(compact) == 1 and compact in "123456":
+            compact = RELAY_CHOICES[int(compact) - 1]
         return compact == RELAY_ORDER
     if len(compact) != 3 or any(digit not in "12345" for digit in compact):
         return False

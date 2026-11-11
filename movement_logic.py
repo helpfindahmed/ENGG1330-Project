@@ -108,7 +108,7 @@ def open_terminal():
     print("\nOBJECTIVES:")
     print("1. Collect debris coins (*) to buy supplies at the shop ($).")
     print("2. Find the exit (>) to reach your crashed ship.")
-    print("3. Repair Engine 1, then use its ignition slot to fix Engine 2.")
+    print("3. Repair the upper engine, then the lower engine.")
     print("4. Access the Reactor [R] to trigger the final sequence.")
     input("\nPress Enter to close > ")
 
@@ -553,7 +553,13 @@ def draw_level_2(msg=""):
 
     display[s["py"]][s["px"]] = "@"
 
-    print("LEVEL 2 -", room.upper())
+    room_names = {
+        "ship": "MAIN DECK",
+        "engine_1": "UPPER ENGINE ROOM",
+        "engine_2": "LOWER ENGINE ROOM",
+        "reactor": "REACTOR ROOM",
+    }
+    print("LEVEL 2 - SHIP |", room_names[room])
 
     for row in display:
         print("".join(row))
@@ -563,7 +569,7 @@ def draw_level_2(msg=""):
     print("Engines repaired:", sum(engine_fixed.values()), "/ 2")
 
     if stage == "repair":
-        print("Goal: repair Engine 1, then Engine 2.")
+        print("Goal: upper [E] first, then lower [E].")
     elif stage == "escape":
         print("Goal: check the controls at >.")
     elif stage == "reactor":
@@ -599,7 +605,7 @@ def use_panel():
             return "This engine is already repaired."
 
         if room == "engine_2" and not engine_fixed["engine_1"]:
-            return "Repair Engine 1 first to get its ignition slot."
+            return "Repair the upper engine first to get its starter position."
 
         os.system("cls" if os.name == "nt" else "clear")
         for line in panel_lines(room):
@@ -628,8 +634,8 @@ def use_panel():
             )
 
         return (
-            "Engine 1 repaired. The ship lights are back on.\n"
-            f"Ignition slot {IGNITION_SLOT} unlocks Engine 2."
+            "Upper engine repaired. The ship lights are back on.\n"
+            f"Starter position {IGNITION_SLOT} unlocks the lower engine."
         )
 
 
