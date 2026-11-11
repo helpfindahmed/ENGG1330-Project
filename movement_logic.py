@@ -965,7 +965,7 @@ def draw_level_2(msg=""):
         objective = "Check controls >"
     else:
         objective = "Activate reactor"
-        print(f"L2 | {room_names[room]} | U:{upper} L:{lower} "
+    print(f"L2 | {room_names[room]} | U:{upper} L:{lower} "
           f"({sum(engine_fixed.values())}/2) | {objective}")
     panel = [
         f"Flash: {s['flash']}%",
@@ -1232,13 +1232,13 @@ if clear_first_level:
         "You make it back to your ship.\n"
         "The forest falls silent behind you as you reach the hull."
     )
-    input("\nPress Enter to board your ship > ")
+    input("Press Enter to board your ship > ")
     draw_level_2(
         "Inside, the ship is dark and powerless.\n"
         "The engines are damaged, but the ship is still reparable.\n"
         "Repair both engines and get the ship moving again."
     )
-    input("\nPress Enter to begin repairs > ")
+    input("Press Enter to begin repairs > ")
 
     while not level_2_clear:
         move = read_turn()
