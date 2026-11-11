@@ -1,6 +1,9 @@
 import os
 import textwrap
 
+from engine_puzzles import IGNITION_SLOT, panel_lines, solves_panel
+from turn_input import read_turn
+
 raw_map = [
     "##########################################################",
     "#@.*........*....###......*..............*.......*...$...#",
@@ -90,8 +93,8 @@ def open_terminal():
     print("dark, uncharted forest. The radar shows ship parts")
     print("scattered nearby. You need to fix the ship to survive.")
     print("\nCONTROLS:")
-    print("W A S D   - Move (Costs battery)")
-    print("F + Dir   - Flash Attack (e.g. F W) - Stuns enemies")
+    print("W A S D   - Move one tile per keypress (Costs battery)")
+    print("F then WASD - Aim a flash attack to stun enemies")
     print("T         - Drop Trap (Step off to arm)")
     print("E         - Interact (Read terminal, buy from shop)")
     print("X         - Quit game")
@@ -106,7 +109,7 @@ def open_terminal():
     print("\nOBJECTIVES:")
     print("1. Collect debris coins (*) to buy supplies at the shop ($).")
     print("2. Find the exit (>) to reach your crashed ship.")
-    print("3. Repair both Engine Rooms [E] inside the ship.")
+    print("3. Repair the upper engine, then the lower engine.")
     print("4. Access the Reactor [R] to trigger the final sequence.")
     input("\nPress Enter to close > ")
 
@@ -333,7 +336,7 @@ while True:
     action_taken = False
     trap_placed = False
     msg = ""
-    move = input("Enter your move: ").strip().upper()
+    move = read_turn()
 
     if move == "W":
         target_y -= 1
@@ -531,6 +534,10 @@ reactor_map = [
 ]
 
 
+def at_engine_panel():
+    return s["grid"][s["py"]][s["px"]] == "C" or near_tile("C")
+
+
 def draw_level_2(msg=""):
     os.system("cls" if os.name == "nt" else "clear")
 
@@ -551,17 +558,36 @@ def draw_level_2(msg=""):
 
     display[s["py"]][s["px"]] = "@"
 
-    print("LEVEL 2 -", room.upper())
+    room_names = {
+        "ship": "MAIN DECK",
+        "engine_1": "UPPER ENGINE ROOM",
+        "engine_2": "LOWER ENGINE ROOM",
+        "reactor": "REACTOR ROOM",
+    }
+    print("LEVEL 2 - SHIP |", room_names[room])
 
     for row in display:
         print("".join(row))
 
     print("Flashlight:", s["flash"])
     print("Traps:", s["traps"])
-    print("Engines repaired:", sum(engine_fixed.values()), "/ 2")
+    upper = "ON" if engine_fixed["engine_1"] else "OFF"
+    lower = "ON" if engine_fixed["engine_2"] else "OFF"
+    repaired = sum(engine_fixed.values())
+    print(f"Engines repaired: {repaired} / 2 | Upper: {upper} | Lower: {lower}")
 
-    if stage == "repair":
-        print("Goal: repair both engines.")
+    if room in engine_fixed:
+        if engine_fixed[room]:
+            print("Engine repaired. Walk to < to return to the main deck.")
+        elif room == "engine_2" and not engine_fixed["engine_1"]:
+            print("Lower engine locked. Go back via < and repair the upper engine.")
+        elif at_engine_panel():
+            print("At the repair panel. Press E to start the puzzle.")
+        else:
+            print("Find C. Stand on it or next to it, then press E to repair.")
+    elif stage == "repair":
+        next_engine = "lower" if engine_fixed["engine_1"] else "upper"
+        print(f"Goal: enter the {next_engine} [E] engine room.")
     elif stage == "escape":
         print("Goal: check the controls at >.")
     elif stage == "reactor":
@@ -589,12 +615,35 @@ def change_room(new_room, x, y):
 def use_panel():
     global stage, enemies_active, level_2_clear, enemy_delay
 
-    if room in ("engine_1", "engine_2"):
-        if not near_tile("C"):
-            return "Move closer to the control panel."
+    if room in engine_fixed:
+        if not at_engine_panel():
+            return "Walk to C or a tile beside it, then press E."
 
         if engine_fixed[room]:
             return "This engine is already repaired."
+
+        if room == "engine_2" and not engine_fixed["engine_1"]:
+            return "Repair the upper engine first to get its starter position."
+
+        feedback = ""
+        while True:
+            os.system("cls" if os.name == "nt" else "clear")
+            for line in panel_lines(room):
+                print(line)
+            if feedback:
+                print(feedback)
+            answer = input("Setting > ").strip()
+            if answer.upper() == "X":
+                return "Panel closed."
+            if solves_panel(room, answer):
+                break
+            feedback = "Incorrect setting. Check the clues and try again."
+
+        if room == "engine_1":
+            print(f"Correct! Upper engine repaired. Starter position: {IGNITION_SLOT}.")
+        else:
+            print("Correct! Lower engine repaired. Both engines are on.")
+        input("\nPress Enter to return to the map > ")
 
         engine_fixed[room] = True
         if room == "engine_1":
@@ -613,10 +662,10 @@ def use_panel():
                 "Go to the Reactor at [R]."
             )
 
-        if room == "engine_1":
-            return "Engine 1 repaired. The ship lights are restored; your flashlight is no longer needed."
-
-        return "Engine repaired. Find the other engine room."
+        return (
+            "Upper engine repaired. The ship lights are back on.\n"
+            f"Starter position {IGNITION_SLOT} unlocks the lower engine."
+        )
 
 
     if room == "ship":
@@ -808,7 +857,7 @@ if clear_first_level:
     input("\nPress Enter to begin repairs > ")
 
     while not level_2_clear:
-        move = input("Enter your move: ").strip().upper()
+        move = read_turn()
         move = move.replace(" ", "")
 
         msg = ""
@@ -870,7 +919,6 @@ if clear_first_level:
                         change_room("engine_2", 14, 1)
 
                     changed_map = True
-                    msg = "Engine room. Find C and press E."
 
                 elif room == "ship" and tile == "R":
                     return_position = (s["px"], s["py"])
