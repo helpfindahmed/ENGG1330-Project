@@ -39,3 +39,18 @@ Generative AI used: Yes
   separate demo in a macOS terminal session before integrating it. Replayed
   forest controls and both ship repairs through the new input and checked
   terminal restoration on exit and interruption.
+
+## Entry
+
+- Member and date: Hongkang Liu, 11 November 2026.
+- Tool and model/version: OpenAI Codex. Exact model version was not recorded.
+- Purpose: Integrate progressive hints with the team's new ship screens and
+  add Windows single-key movement.
+- Substantial parts affected: Engine panel interaction in `movement_logic.py`
+  and console input in `turn_input.py`.
+- What was kept and how it was checked: Kept the team's updated map, fixed-size
+  panel renderer, and power restoration after the upper engine. Replayed both
+  repairs in an 80 by 24 macOS terminal and checked hint progression, retry and
+  reopen behavior, and flashlight drain before and after the first repair.
+  Checked Windows command handling with simulated console input. A native
+  Windows console test remains pending.

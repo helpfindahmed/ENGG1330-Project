@@ -4,6 +4,7 @@ import sys
 import time
 
 from engine_puzzles import IGNITION_SLOT, PANEL_HINTS, panel_lines, solves_panel
+from turn_input import read_turn
 
 # Stage 4: presentation only; no gameplay state is changed here.
 def intro_terminal_size():
@@ -185,60 +186,6 @@ def play_introduction():
             termios.tcsetattr(sys.stdin.fileno(), termios.TCSAFLUSH, saved_input)
         sys.stdout.write("\033[?25h\033[H")
         sys.stdout.flush()
-
-
-def read_turn(prompt="Move [WASD | F + direction | E | T | H | X] > "):
-    if not sys.stdin.isatty() or os.name != "posix":
-        return input("Enter your move: ").strip().upper()
-
-    import select
-    import termios
-    import tty
-
-    fd = sys.stdin.fileno()
-    original = termios.tcgetattr(fd)
-
-    def read_key():
-        key = os.read(fd, 1)
-        if key != b"\x1b":
-            return key.decode("ascii", errors="replace").upper()
-
-        # Consume terminal escape sequences so an arrow's final letter
-        # cannot become a movement command.
-        if select.select([fd], [], [], 0.03)[0]:
-            prefix = os.read(fd, 1)
-            if prefix in (b"[", b"O"):
-                while select.select([fd], [], [], 0.03)[0]:
-                    part = os.read(fd, 1)
-                    if not part or b"@" <= part <= b"~":
-                        break
-        return "\x1b"
-
-    try:
-        tty.setcbreak(fd, termios.TCSANOW)
-        while True:
-            print("\r\033[2K" + prompt, end="", flush=True)
-            key = read_key()
-            if key in ("", "\x04", "X"):
-                print("", end="", flush=True)
-                return "X"
-            if key in ("\r", "\n", "\x1b"):
-                print("", end="", flush=True)
-                continue
-            if key != "F":
-                print(key, end="", flush=True)
-                return key
-
-            print("F", end="", flush=True)
-            print("\r\033[2K" + "Aim [WASD, Esc to cancel] > ", end="", flush=True)
-            direction = read_key()
-            print("", end="", flush=True)
-            if direction in ("", "\x04", "X"):
-                return "X"
-            if direction in ("W", "A", "S", "D"):
-                return "F" + direction
-    finally:
-        termios.tcsetattr(fd, termios.TCSANOW, original)
 
 
 def panel_answer(lines, prompt="Setting > ", max_length=16):

@@ -9,7 +9,7 @@ def main():
     print("Direct WASD demo. E opens a text prompt. F then WASD aims. X quits.")
     while True:
         print(f"Turn {turn} | player x={x} | enemy turns={turn} | player y={y}")
-        command = read_turn()
+        command = read_turn("Move [WASD | F + direction | E | T | X] > ")
         if command == "X":
             break
         if command == "E":
