@@ -237,6 +237,51 @@ def panel_answer(lines, prompt="Setting > ", max_length=16):
             termios.tcsetattr(sys.stdin.fileno(), termios.TCSANOW, saved)
 
 
+def confirm_forest_exit(question):
+    """A confirmation never spends resources or advances the combat clock."""
+    feedback = ""
+    while True:
+        lines = [question, "", "[1] Yes", "[2] No"]
+        if feedback:
+            lines += ["", feedback]
+        choice = panel_answer(lines, "Choose 1 or 2, then press Enter > ")
+        if choice in ("1", "2"):
+            return choice == "1"
+        feedback = "Invalid choice. Enter 1 or 2."
+
+
+def secret_ending():
+    """A brief visual interruption, then a clean end with restart guidance."""
+    saved = None
+    try:
+        if sys.stdin.isatty() and os.name == "posix":
+            import termios
+            saved = termios.tcgetattr(sys.stdin.fileno())
+            settings = termios.tcgetattr(sys.stdin.fileno())
+            settings[3] &= ~(termios.ECHO | termios.ECHONL | termios.ICANON)
+            settings[6][termios.VMIN] = 1
+            settings[6][termios.VTIME] = 0
+            termios.tcsetattr(sys.stdin.fileno(), termios.TCSAFLUSH, settings)
+        sys.stdout.write("\033[?25l")
+        intro_timed_frame(['   /\\    /\\       /\\', '  /##\\  /  \\  ## /  \\',
+                           "  ||    ||   []    ||", "[DISPLAY] SYNC LOST"], 0.15)
+        intro_timed_frame(["#  []  ##   --   []", "   ##       #  #", "[DI$PLAY] -- --"], 0.12)
+        intro_timed_frame([], 0.7)
+        intro_timed_frame(["YOU DIED."], 1.2)
+        intro_timed_frame(["Just kidding."], 1.0)
+        intro_timed_frame(["Secret ending development in progress."], 1.0)
+    except (EOFError, KeyboardInterrupt):
+        raise SystemExit(0)
+    finally:
+        if saved is not None:
+            termios.tcsetattr(sys.stdin.fileno(), termios.TCSAFLUSH, saved)
+        sys.stdout.write("\033[?25h")
+        sys.stdout.flush()
+    panel_answer(["Secret ending development in progress.", "",
+                  "To restart, run this Python file again."],
+                 "Press Enter to exit > ", 0)
+
+
 def debug_menu():
     print("DEBUG MENU")
     print("Press Enter for the full game.")
@@ -259,7 +304,7 @@ raw_map = [
     "#...#####......########......#.......#.#.*...*.......#...#",
     "#...#.*.....*................#.......###...............>.#",
     "#..........#####......*......#...*............############",
-    "#...$...*..#...#......*..................................#",
+    "#<..$...*..#...#......*..................................#",
     "##########################################################",
 ]
 
@@ -705,9 +750,18 @@ while debug_mode != "ship":
                 msg = "The terminal blocks the path. Stand beside it and press E."
             else:
                 msg = "Dense undergrowth blocks that path."
-        elif s["grid"][target_y][target_x] == ">":
-            clear_first_level = True
-            draw("You made it out of the dark woods.")
+        elif s["grid"][target_y][target_x] in (">", "<"):
+            ship_exit = s["grid"][target_y][target_x] == ">"
+            question = ("Make a run towards the ship?" if ship_exit
+                        else "Go deeper into the forest?")
+            if not confirm_forest_exit(question):
+                draw("You stay in the forest.")
+                continue
+            if ship_exit:
+                clear_first_level = True
+                draw("You made it out of the dark woods.")
+            else:
+                secret_ending()
             break
         else:
             if any((target_x, target_y) == tuple(g) and alien_stunned[i] == 0
