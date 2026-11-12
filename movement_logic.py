@@ -694,13 +694,13 @@ while debug_mode != "ship":
         if near_tile("?"):
             open_terminal()
             msg = "Manual closed."
+            action_taken = True
         elif near_tile("$"):
             enter_shop()
             msg = "Left the shop."
+            action_taken = True
         else:
             msg = "Get closer to the shop ($) or terminal (?) first."
-        draw(msg)
-        continue
     elif len(move) == 2 and move[0] == "F":
         direction = move[1]
         dx = 0
