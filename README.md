@@ -8,6 +8,11 @@ Welcome to the dark. This game is designed to be punishing but fair. Surviving t
 
 Here is everything you need to know to survive.
 
+In a macOS, Linux, or Windows terminal, press WASD to move one turn at a time.
+Press F and then a direction to fire. Menus and puzzle answers use Enter.
+If the game shows `Enter your move:`, type your command and press Enter
+(for a Big Bang, type both letters together, such as `FW`).
+
 ------------------------------------------------------
 1. THE DUAL AI SYSTEM (GHOST VS. HUNTER)
 ------------------------------------------------------

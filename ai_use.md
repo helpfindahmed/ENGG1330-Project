@@ -16,6 +16,7 @@ Generative AI used: Yes
   After player feedback, labelled the engine rooms by deck position and
   asked players to enter the three part numbers in order. Added retries
   inside both panels and explicit repair confirmation before returning.
+  Added progressive hints that become more specific after wrong answers.
   Added persistent repair instructions on the map and let players use the
   console while standing on it or beside it.
   Added separate upper and lower engine status labels after player feedback.
@@ -24,7 +25,7 @@ Generative AI used: Yes
   test incorrect input, panel cancellation, the engine prerequisite, power
   restoration, and reaching the reactor ending. Tested the map hints and both
   console positions. Checked both panel sizes
-  against 80 by 24. The full game and course container still need verification.
+  against 80 by 24. See the later entry for the course container replay.
 
 ## Entry
 
@@ -38,3 +39,31 @@ Generative AI used: Yes
   separate demo in a macOS terminal session before integrating it. Replayed
   forest controls and both ship repairs through the new input and checked
   terminal restoration on exit and interruption.
+
+## Entry
+
+- Member and date: Hongkang Liu, 11 November 2026.
+- Tool and model/version: OpenAI Codex. Exact model version was not recorded.
+- Purpose: Integrate progressive hints with the team's new ship screens and
+  add Windows single-key movement.
+- Substantial parts affected: Engine panel interaction in `movement_logic.py`
+  and console input in `turn_input.py`.
+- What was kept and how it was checked: Kept the team's updated map, fixed-size
+  panel renderer, and power restoration after the upper engine. Replayed both
+  repairs in an 80 by 24 macOS terminal and checked hint progression, retry and
+  reopen behavior, and flashlight drain before and after the first repair.
+  Checked Windows command handling with simulated console input. A native
+  Windows console test remains pending.
+
+## Entry
+
+- Member and date: Hongkang Liu, 11 November 2026.
+- Tool and model/version: OpenAI Codex. Exact model version was not recorded.
+- Purpose: Fix issues found in the pre-push review.
+- Substantial parts affected: The ship display in `movement_logic.py`, the
+  upper engine hint in `engine_puzzles.py`, and Escape handling in
+  `turn_input.py`.
+- How results were checked: Replayed both engine repairs, boarding enemies
+  and the reactor ending on macOS and in the offline course Docker image.
+  Checked all 115 ship map frames against 80 by 24. Verified on macOS that
+  a move typed immediately after Escape still advances one turn.

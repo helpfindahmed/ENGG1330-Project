@@ -3,6 +3,9 @@ import textwrap
 import sys
 import time
 
+from engine_puzzles import IGNITION_SLOT, PANEL_HINTS, panel_lines, solves_panel
+from turn_input import read_turn
+
 # Stage 4: presentation only; no gameplay state is changed here.
 def intro_terminal_size():
     try:
@@ -196,110 +199,6 @@ def play_introduction():
         sys.stdout.flush()
 
 
-RELAY_ORDER = "231"
-IGNITION_SLOT = RELAY_ORDER.index("3") + 1
-FUEL_TOTAL = 9
-
-
-def panel_lines(room):
-    """Return the clues shown on an engine's repair screen."""
-    if room == "engine_1":
-        return (
-            "UPPER ENGINE | CONNECT THE PARTS",
-            "",
-            "Connect all three parts in the correct order.",
-            "1. Fuel pump",
-            "2. Cooling system",
-            "3. Starter",
-            "",
-            "The cooling system goes before the fuel pump.",
-            "The fuel pump goes immediately after the starter.",
-            "",
-            "Enter the three part numbers in order, using each once.",
-            "Press Enter to submit. X closes the panel.",
-        )
-    return (
-        "LOWER ENGINE | BALANCE THE FUEL",
-        "",
-        "Set fuel valves A, B and C to whole numbers from 1 to 5.",
-        "B needs one more unit than A.",
-        f"C must match the upper engine's starter position ({IGNITION_SLOT}).",
-        f"The three valves must total {FUEL_TOTAL} units.",
-        "",
-        "Enter the three numbers in A B C order. X closes the panel.",
-    )
-
-
-def solves_panel(room, answer):
-    """Check a relay order or a set of fuel valve settings."""
-    compact = "".join(answer.upper().split())
-    if room == "engine_1":
-        return compact == RELAY_ORDER
-    if len(compact) != 3 or any(digit not in "12345" for digit in compact):
-        return False
-
-    valve_a, valve_b, valve_c = map(int, compact)
-    return (
-        valve_b == valve_a + 1
-        and valve_c == IGNITION_SLOT
-        and valve_a + valve_b + valve_c == FUEL_TOTAL
-    )
-
-
-def read_turn(prompt="Move [WASD | F + direction | E | T | H | X] > "):
-    if not sys.stdin.isatty() or os.name != "posix":
-        return input("Enter your move: ").strip().upper()
-
-    import select
-    import termios
-    import tty
-
-    fd = sys.stdin.fileno()
-    original = termios.tcgetattr(fd)
-
-    def read_key():
-        key = os.read(fd, 1)
-        if key != b"\x1b":
-            return key.decode("ascii", errors="replace").upper()
-
-        # Consume terminal escape sequences so an arrow's final letter
-        # cannot become a movement command.
-        if select.select([fd], [], [], 0.03)[0]:
-            prefix = os.read(fd, 1)
-            if prefix in (b"[", b"O"):
-                while select.select([fd], [], [], 0.03)[0]:
-                    part = os.read(fd, 1)
-                    if not part or b"@" <= part <= b"~":
-                        break
-        return "\x1b"
-
-    try:
-        tty.setcbreak(fd, termios.TCSANOW)
-        while True:
-            print("\r\033[2K" + prompt, end="", flush=True)
-            key = read_key()
-            if key in ("", "\x04", "X"):
-                print("", end="", flush=True)
-                return "X"
-            if key in ("\r", "\n", "\x1b"):
-                print("", end="", flush=True)
-                continue
-            if key != "F":
-                print(key, end="", flush=True)
-                return key
-
-            print("F", end="", flush=True)
-            print("\r\033[2K" + "Aim [WASD, Esc to cancel] > ", end="", flush=True)
-            direction = read_key()
-            print("", end="", flush=True)
-            if direction in ("", "\x04", "X"):
-                return "X"
-            if direction in ("W", "A", "S", "D"):
-                return "F" + direction
-    finally:
-        termios.tcsetattr(fd, termios.TCSANOW, original)
-
-
 def panel_answer(lines, prompt="Setting > ", max_length=16):
     """Bound puzzle input to one screen, including invalid or pasted input."""
     saved = None
@@ -348,7 +247,6 @@ def debug_menu():
         if command in ("", "forest", "ship"):
             return command or "full"
         print("Unknown command. Use forest, ship, or press Enter.")
-
 
 raw_map = [
     "##########################################################",
@@ -977,7 +875,7 @@ def draw_level_2(msg=""):
     ]
     for index, row in enumerate(display):
         side = panel[index] if index < len(panel) else ""
-        print(f"{''.join(row).replace('.', ' '):<60} {side:<19}")
+        print(f"{''.join(row).replace('.', ' '):<60} {side}".rstrip())
     print_dialogue(msg)
 
 
@@ -1004,17 +902,22 @@ def use_panel():
         if room == "engine_2" and not engine_fixed["engine_1"]:
             return "Repair the upper engine first to get its starter position."
 
-        feedback = ""
+        hints = PANEL_HINTS[room]
         while True:
             lines = list(panel_lines(room))
-            if feedback:
-                lines += ["", feedback]
+            if engine_attempts[room]:
+                hint_number = min(engine_attempts[room], len(hints))
+                lines.extend((
+                    "",
+                    "Incorrect setting. Check the clues and try again.",
+                    f"Hint {hint_number}/{len(hints)}: {hints[hint_number - 1]}",
+                ))
             answer = panel_answer(lines)
             if answer.upper() == "X":
                 return "Panel closed."
             if solves_panel(room, answer):
                 break
-            feedback = "Incorrect setting. Check the clues and try again."
+            engine_attempts[room] += 1
 
         if room == "engine_1":
             success = (f"Correct! Upper engine repaired. Starter position: "
@@ -1202,6 +1105,7 @@ if clear_first_level:
         "engine_1": False,
         "engine_2": False,
     }
+    engine_attempts = dict.fromkeys(engine_fixed, 0)
 
     enemies_active = False
     level_2_clear = False
