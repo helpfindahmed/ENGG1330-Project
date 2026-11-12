@@ -67,3 +67,35 @@ Generative AI used: Yes
   and the reactor ending on macOS and in the offline course Docker image.
   Checked all 115 ship map frames against 80 by 24. Verified on macOS that
   a move typed immediately after Escape still advances one turn.
+
+## Entry
+
+- Member and date: Hongkang Liu, 12 November 2026.
+- Tool and model/version: OpenAI Codex. Exact model version was not recorded.
+- Purpose: Improve first-time player guidance and feedback on invalid input.
+- Substantial parts affected: Briefings, objectives, map rendering, and panel
+  feedback in `movement_logic.py` and turn input in `turn_input.py`.
+- How results were checked: Played from the opening story to the reactor
+  ending on macOS with colour enabled and disabled. All 191 forest and ship
+  map frames in each run fit 80 by 24. Compared all five maps against the
+  team version to verify the geometry. Tested blocked moves, invalid keys
+  and aiming, oversized menu and puzzle input, bracketed paste at movement
+  prompts, and shrinking and restoring the terminal mid-game.
+  Verified the cyan player icon in VS Code's terminal renderer at 80 by 24
+  and checked the ASCII fallback under simulated Windows, non-UTF-8, and
+  redirected output.
+  Repeated the terminal checks on Ubuntu and Windows GitHub-hosted runners
+  using the same game files. Both passed at 80 by 24, including direct WASD,
+  player-marker alignment, resizing, invalid actions, and both engine puzzles.
+  Paste rejection was exercised on Linux.
+  Enabled the one-cell smiley on Windows UTF-8 consoles and confirmed that
+  both the smiley and the explicit ASCII fallback stay aligned on Windows
+  and Ubuntu at 80 by 24.
+  Rebuilt the course Docker v03 image from the provided bundle and replayed
+  the current game from the opening through the reactor ending in a fresh
+  container with networking disabled. All 191 captured forest and ship map
+  frames fit 80 by 24. The run covered invalid input, terminal resizing,
+  engine retries, and battery behavior after the upper engine repair.
+  Clarified the opening's playable objective and corrected the README's
+  grace-period and battery guidance. Rechecked the full revised build in
+  the same offline course v03 container at 80 by 24.
