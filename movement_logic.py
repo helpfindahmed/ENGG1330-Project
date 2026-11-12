@@ -6,7 +6,6 @@ import time
 from engine_puzzles import IGNITION_SLOT, PANEL_HINTS, panel_lines, solves_panel
 from turn_input import read_turn
 
-# Stage 4: presentation only; no gameplay state is changed here.
 def intro_terminal_size():
     try:
         return os.get_terminal_size(sys.stdout.fileno())
@@ -29,10 +28,10 @@ def intro_draw(lines, prompt, size):
         rows = [(i + 1, 1, line) for i, line in enumerate(message[:height])]
     sys.stdout.write("\033[2J\033[H")
     for row, column, line in rows:
-        if row <= height: 
+        if row <= height:
             sys.stdout.write(f"\033[{row};{column}H" +
                              line[:max(0, width - column)])
-                             
+
     sys.stdout.flush()
     return ready
 
@@ -63,46 +62,59 @@ def _intro_key(interactive, ready, size):
     return ""
 
 
-def intro_frame(text, reveal=True):
-    """Reveal one text frame, then wait for Enter or Backspace."""
+def intro_steps(text):
+    """Build sentence reveals, keeping system blocks and objectives together."""
+    import re
+
+    steps = []
     lines = []
-    for paragraph in text.split("\n"):
-        lines.extend(textwrap.wrap(paragraph, width=72) or [""])
-    if len(lines) > 18:
-        raise ValueError("Introduction frame exceeds its 18-line text area")
+    for paragraph in text.split("\n\n"):
+        if not paragraph.strip():
+            continue
+        if paragraph.startswith(("[", "OBJECTIVE:")):
+            units = [paragraph]
+        else:
+            units = re.split(r"(?<=[.!?])\s+", paragraph)
+        for unit in units:
+            added = [line for part in unit.splitlines()
+                     for line in (textwrap.wrap(part, width=72) or [""])]
+            if len(added) > 18:
+                raise ValueError("Introduction sentence exceeds its text area")
+            separator = [""] if lines else []
+            if len(lines) + len(separator) + len(added) > 18:
+                lines = []
+                separator = []
+            lines = lines + separator + added
+            steps.append(lines[:])
+    return steps or [[""]]
+
+
+def intro_frame(text, start=0):
+    """Reveal one sentence per Enter; Backspace revisits the previous step."""
+    steps = intro_steps(text)
+    index = min(start, len(steps) - 1)
     prompt = "Enter to continue | Backspace to go back | Ctrl+C to quit"
     interactive = sys.stdin.isatty()
-    previous_size = None
-    previous_visible = -1
-    visible = 0
-    total = sum(len(line) for line in lines)
-    if not reveal:
-        visible = total
+    previous = None
     while True:
         size = intro_terminal_size()
         ready = size[0] >= 80 and size[1] >= 24
-        if size != previous_size or visible != previous_visible:
-            shown = []
-            remaining = visible
-            for line in lines:
-                shown.append(line[:remaining])
-                remaining = max(0, remaining - len(line))
-            intro_draw(shown, prompt, size)
-            previous_size = size
-            previous_visible = visible
+        if (size, index) != previous:
+            intro_draw(steps[index], prompt, size)
+            previous = (size, index)
         key = _intro_key(interactive, ready, size)
         if key in ("\x03", "\x04"):
             raise KeyboardInterrupt
-        if not ready:
+        if not ready or intro_terminal_size() != size:
             continue
         if key in ("\x08", "\x7f"):
-            return "back"
-        if visible < total:
-            visible += 1
-            continue
-        if key in ("\n", "\r"):
-            return "next"
-
+            if index == 0:
+                return "back"
+            index -= 1
+        elif key in ("\n", "\r"):
+            if index == len(steps) - 1:
+                return "next"
+            index += 1
 
 
 def intro_timed_frame(lines, seconds):
@@ -129,18 +141,101 @@ def intro_timed_frame(lines, seconds):
 
 
 def intro_story():
-    """Run the approved narrative, preserving Enter and Backspace navigation."""
+    """Short narrative pages with Enter and Backspace navigation."""
     frames = [
-        'You are a spacecraft systems engineer. You work for a maintenance contractor that services remote mining colonies, orbital stations, and anyone else willing to pay the call-out charge.\n\nThey send you between planets to repair failing equipment, usually several months after someone decided maintenance was too expensive. \nYou fix it, sign the paperwork, and leave before anything else breaks. \nYou don’t get paid enough for this, but you do get paid. That has kept you here for six years.\n\nToday’s assignment is a mining settlement on another planet. Its ore-processing plant keeps overheating. The replacement coolant regulator is already installed. From the photographs, you can see that someone fitted it backwards.\n\nYou pack a socket adapter and accept the job. Your supervisor has allowed two hours for the repair. Travel, apparently, is something you do in your spare time.',
-        'Your ship leaves the transfer station on its assigned course. You secure your tools and check the approach instructions.\n\nHalfway through the journey, the steering thrusters fire.\n\n[NAVIGATION] COURSE CORRECTION APPLIED\n[FLIGHT PLAN] NO SCHEDULED MANOEUVRE\n\nYou bring up the route. Your destination is still listed, but the ship is steering toward a second set of coordinates.\n\nYou cancel the correction and reload the flight plan.\n\n[AUTOPILOT] POSITION SOURCES DISAPPROVED',
-        'You disconnect the autopilot and take manual control.\n\nThe thrusters respond, but the position display still keeps jumping. You cannot tell which correction made things worse.\n\nA planet fills the forward window. There is no name beside it.\n\n[WARNING] ATMOSPHERIC ENTRY IMMINENT\n[ENGINES] DESCENT RATE EXCEEDS AVAILABLE THRUST\n\nYou turn the ship upside-down and spread the remaining thrust across the descent. The vibration makes the controls difficult to hold.\n\nBelow the clouds, an enormous forest reaches to the horizon. \nYou aim for a break in the canopy and deploy the landing gear.',
-        'You wake with your weight hanging against the restraint straps.\n\nThe emergency lights are on. You release the harness, lower yourself to the tilted floor, and work through the damage report.\n\nBoth engines have shut down. The thrust regulator’s mounting has torn away, leaving an empty socket in the service bay.\n\n[DIAGNOSTICS] THRUST REGULATOR MISSING\n[TAKEOFF] UNAVAILABLE\n[RADAR] MATCHING MAINTENANCE BEACON DETECTED\n\nThe signal lies beyond the damaged trees ahead of the wreck. The regulator may have been thrown clear during the crash.\n\nYou could restore power without it but you cannot control enough thrust to lift the ship.',
-        'OBJECTIVE: FIND THE THRUST REGULATOR IN THE FOREST\nAND BRING IT BACK TO REPAIR THE SHIP.\n\nYou mark the ship on your handheld, take your equipment, and follow the bearing.\n\nThe first stretch is easy. Broken branches show where the ship came through. Beyond them, smooth trunks rise into broad fans of leaves. Warm droplets fall from the canopy long after you pass beneath it.\n\nYou follow the navigation arrow on your handheld.',
-        'Thick roots block the direct path. You walk around them and follow a shallow channel between the trees.\n\nThe ground is soft enough to leave footprints. You check behind you occasionally, making sure you can follow them back.\n\nFarther along, the regulator’s signal starts cutting out.\n\n[RADAR] CONTACT INTERMITTENT\n[ROUTE GUIDANCE] RECALCULATING\n\nYou climb out of the channel to recover the signal. When it returns, the navigation arrow points along the slope. You follow it.',
-        'You cross the slope, work around a fallen trunk, and descend through another gap in the roots.\n\nThe channel below is dry. You walk along it looking for your footprints before accepting that it is a different channel.\n\nYou request a route back to the ship.\n\n[POSITION FIX] ACCURACY LOW\n[RETURN TRACK] INCOMPLETE\n\nThe recorded trail jumps across terrain you remember going around. You retrace your last few steps, but the fallen trunk is hidden behind several others.\n\nA branch knocks against something farther down the channel. You stop to listen. It does not happen again.\nYour ship’s marker is now well beyond the edge of the local map.',
-        'For a moment, the ship link returns. A stored message arrives before you can request another position fix.\n\n[SHIP DATABASE] PLANETARY IDENTIFICATION COMPLETE\n[WORLD] K-17\n[THREAT CLASSIFICATION] EXTREME\n[EXPEDITION RECORDS] INCOMPLETE\n[FAUNA] EXCEPTIONALLY DANGEROUS SPECIES DOCUMENTED\n[ACTIVITY] INCREASES AFTER LOCAL NIGHTFALL\n[YOUR POSITION] WITHIN RECORDED HABITAT\n[RECOMMENDATION] RETURN TO SHELTER',
-        'You open the attached survey. Most of its entries contain coordinates and missing reports. There is no marked safe route.\n\nThe database had flagged a possible match earlier. It only released the warning once it confirmed the planet.\n\nYou would have preferred a less reliable warning earlier.',
-        'Above the canopy, the patches of sky are turning grey.\n\nThe regulator’s signal appears once more, then drops out. You put away the search bearing.\n\nThe ship is damaged, but its hatch still closes. Whatever repairs it needs, you need to reach it before nightfall.\n\nYou turn toward its last recorded position. A wall of roots blocks the direct route, and the handheld offers no useful way around it.\n\nYou will have to find your own path.\n\nYour immediate objective is to survive the forest and reach your crashed spacecraft. Find your way back to the ship (>).',
+        (
+            'You are a spacecraft systems engineer. Your employer sends you '
+            'between planets to fix equipment nobody bothers maintaining.\n'
+            '\n'
+            'You don’t get paid enough for this, but you do get paid.\n'
+            '\n'
+            'That has kept you here for six years.\n'
+            '\n'
+            'Today’s job is an overheating mining plant. Someone installed the'
+            ' coolant regulator backwards.\n'
+            '\n'
+            'Your supervisor has allowed two hours.\n'
+            'Travel, apparently, is something you do in your spare time.'
+        ),
+        (
+            'Halfway there, the ship changes course.\n'
+            '\n'
+            '[NAVIGATION] UNSCHEDULED COURSE CORRECTION\n'
+            '\n'
+            'You cancel it. The ship turns again.\n'
+            '\n'
+            'You switch to manual control, but the navigation display keeps '
+            'jumping. An unidentified planet fills the window.\n'
+            '\n'
+            '[WARNING] ATMOSPHERIC ENTRY IMMINENT\n'
+            '\n'
+            'You fire the engines to slow your descent.\n'
+            'Below you, there is nothing but forest.'
+        ),
+        (
+            'You wake in the damaged cockpit and check the diagnostics.\n'
+            '\n'
+            '[ENGINES] OFFLINE\n'
+            '[THRUST REGULATOR] MISSING\n'
+            '[RADAR] COMPONENT SIGNAL DETECTED\n'
+            '\n'
+            'The regulator was thrown clear during the crash.\n'
+            'Without it, the ship cannot take off.\n'
+            '\n'
+            'Its signal is coming from the forest. You mark the ship’s '
+            'position, take your equipment, and follow the navigation arrow.\n'
+            '\n'
+            'OBJECTIVE: FIND THE REGULATOR AND BRING IT BACK.'
+        ),
+        (
+            'You follow the signal between enormous trees, walking around '
+            'roots and fallen branches.\n'
+            '\n'
+            'Each detour takes you farther from the ship.\n'
+            'Then the signal disappears.\n'
+            '\n'
+            '[ROUTE GUIDANCE] RECALCULATING\n'
+            '\n'
+            'You climb a slope to recover it. When you turn back, you cannot '
+            'find the path you came from.\n'
+            '\n'
+            'You check your recorded route.\n'
+            '\n'
+            '[RETURN TRACK] INCOMPLETE\n'
+            '\n'
+            'You try retracing your steps, but nothing looks familiar.'
+        ),
+        (
+            'Your handheld finally identifies the planet.\n'
+            '\n'
+            '[THREAT CLASSIFICATION] EXTREME\n'
+            '[EXPEDITION RECORDS] INCOMPLETE\n'
+            '[SPECIES] EXCEPTIONALLY DANGEROUS\n'
+            '[ACTIVITY] INCREASES AFTER NIGHTFALL\n'
+            '[YOUR POSITION] WITHIN THEIR TERRITORY\n'
+            '\n'
+            'The system waited until it was certain before warning you.\n'
+            '\n'
+            'You would have preferred a less reliable warning earlier.'
+        ),
+        (
+            'It is getting dark. Something moves behind the trees.\n'
+            '\n'
+            'You stop looking for the regulator.\n'
+            'You need to get back to the ship.\n'
+            '\n'
+            'The navigation system cannot tell you how.\n'
+            '\n'
+            'OBJECTIVE: SURVIVE THE FOREST AND FIND YOUR SHIP (>).'
+        ),
+        (
+            'You might be wondering why we narrated all of that instead of '
+            'letting you play through it.\n'
+            '\n'
+            '…\n'
+            '\n'
+            'Goodluck.'
+        ),
     ]
     crash_frames = [
         ['[LANDING GEAR] DEPLOYMENT INCOMPLETE', '', '  +------------------------------------------------------+', '  |                                                      |', '  |                         /\\                           |', '  |           /\\           /  \\        /\\                |', '  |     /\\   /  \\    /\\    /    \\      /  \\       /\\       |', '  |____/  \\_/    \\__/  \\__/      \\____/    \\_____/  \\______|', '  |                                                      |', '  +------------------------------------------------------+', '', '[DESCENT] PULL UP'],
@@ -149,31 +244,22 @@ def intro_story():
     ]
     index = 0
     while index < len(frames):
-        if index == 3:
+        if index == 2:
             for lines, delay in zip(crash_frames, (0.2, 0.2, 0.15)):
                 intro_timed_frame(lines, delay)
             intro_timed_frame([], 0.45)
-        if index == 7:
-            lead, notices = frames[index].split("\n\n", 1)
+        if index == 4:
+            lead, notices, _ = frames[index].split("\n\n", 2)
             lines = textwrap.wrap(lead, width=72) + [""]
             intro_timed_frame(lines, 1.0)
             for notice in notices.splitlines():
                 lines.append(notice)
-                intro_timed_frame(lines, 0.8)
-            result = intro_frame(frames[index], reveal=False)
-        else:
-            result = intro_frame(frames[index])
+                intro_timed_frame(lines, 0.4)
+        result = intro_frame(frames[index], start=1 if index == 4 else 0)
         if result == "back":
             index = max(0, index - 1)
         else:
             index += 1
-
-    joke = textwrap.wrap(
-        "You might be wondering why we narrated all of that instead "
-        "of letting you play through it.", width=72)
-    intro_timed_frame(joke, 2.0)
-    intro_timed_frame(joke + ["", "…"], 1.0)
-    intro_timed_frame(joke + ["", "…", "", "Goodluck."], 1.0)
 
 
 def play_introduction():
@@ -317,7 +403,7 @@ shop_positions = {
 
 
 s = {"grid": [list(row) for row in raw_map],
-     "px": -1,  
+     "px": -1,
      "py": -1,
      "flash": 100,
      "battery_buys": 0,
@@ -337,7 +423,6 @@ help_unlocked = False
 
 
 def enter_shop():
-    # Show stock limit dynamically
     print()
     print(f"enter 1 for +50 Battery (Bought {s['battery_buys']}/2) - 40cc")
     print("enter 2 for 1 Trap            - 20cc")
@@ -467,7 +552,7 @@ def draw(msg=""):
         if (x, y) != (s["px"], s["py"]):
             symbol = "G" if i == 0 else "H"
             if alien_stunned[i] > 0:
-                symbol = symbol.lower()  # stunned aliens == g.
+                symbol = symbol.lower()
             display[y][x] = symbol
     print("LEVEL 1 - FOREST | OBJECTIVE: RETURN TO SHIP (>)")
     panel = [
@@ -648,7 +733,8 @@ elif debug_mode == "forest":
     time.sleep(0.5)
 
 if debug_mode != "ship":
-    draw("Move beside ? and press E for help. Press H to reopen it afterward.")
+    draw("You hear rustling among the leaves.\n"
+         "Move beside ? and press E for help. Press H to reopen it afterward.")
 
 clear_first_level = debug_mode == "ship"
 while debug_mode != "ship":
@@ -942,7 +1028,6 @@ def change_room(new_room, x, y):
     s["py"] = y
 
 
-
 def use_panel():
     global stage, enemies_active, level_2_clear
 
@@ -1026,122 +1111,172 @@ def use_panel():
         if not all(engine_fixed.values()):
             return "Repair both engines first."
 
+        reactor_decision()
         level_2_clear = True
+        return "The reactor passes the point of recovery."
+def play_reactor_frames(frames):
+    """Run bounded cinematics with no echoed keys or gameplay-state changes."""
+    saved = None
+    try:
+        if sys.stdin.isatty() and os.name == "posix":
+            import termios
+            saved = termios.tcgetattr(sys.stdin.fileno())
+            settings = termios.tcgetattr(sys.stdin.fileno())
+            settings[3] &= ~(termios.ECHO | termios.ECHONL | termios.ICANON)
+            settings[6][termios.VMIN] = 1
+            settings[6][termios.VTIME] = 0
+            termios.tcsetattr(sys.stdin.fileno(), termios.TCSAFLUSH, settings)
+        sys.stdout.write("\033[?25l")
+        for text, delay in frames:
+            intro_timed_frame(text.splitlines(), delay)
+    except (EOFError, KeyboardInterrupt):
+        raise SystemExit(0)
+    finally:
+        if saved is not None:
+            termios.tcsetattr(sys.stdin.fileno(), termios.TCSAFLUSH, saved)
+        sys.stdout.write("\033[?25h")
+        sys.stdout.flush()
 
-        return (
-            "You activate the ship's self-destruct system.\n"
-            "The Ghost and Hunter smash through the door.\n"
-            "A flash of light swallows everything.\n"
-            "The ship, the creatures, and you are gone.\n"
-            "THE END."
-        )
-def explosion_animation():
-    import time
 
+def reactor_repair_animation():
     frames = [
-        r"""
-                    !
-                    !
-             _______|_______
-        ____/_______________\____
-       /_________________________\
-  ~~~~~\_________________________/~~~~~
-  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-          REACTOR OVERLOAD
-        """,
-
-        r"""
-                  \ | /
-                   \|/
-             ______*_______
-        ____/_____*#*______\____
-       /_________*###*__________\
-  ~~~~~\___________*____________/~~~~~~
-  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-           CORE UNSTABLE
-        """,
-
-        r"""
-              \    |    /
-               \   |   /
-           ----- ***** -----
-              **#######**
-        ____***#########***____
-       /___**#############**___\
-  ~~~~~\_____***#######***_____/~~~~~~~
-  ~~~~~~~~~~~~~*******~~~~~~~~~~~~~~~~
-
-                BOOM!
-        """,
-
-        r"""
-        .       \  |  /        .
-             .   \ | /    .
-          *   ***#####***   *
-       .   **#############**   .
-     -----#################-----
-       .   **#############**   .
-          *   ***#####***   *
-             .   / | \    .
-        .       /  |  \        .
-
-                BOOM!
-        """,
-
-        r"""
-       #           .             /
-              *         #
-   \                  .                 *
-          .      *           /
-      #                *
-             /                  #
-  ~~~~~~~~ . ~~~~~ * ~~~~~~ . ~~~~~~~~~~
-  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-          THE SHIP BREAKS APART
-        """,
-
-        r"""
-             .                 .
-                       .
-       .           .               .
-
-                 .
-  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-                SILENCE.
-        """,
-
-        r"""
-
-
-  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-
-       The ship is gone.
-       The Ghost and Hunter are gone.
-       You never leave the reactor room.
-
-               THE END
-        """,
+        ("[DIAGNOSTICS] COOLANT CONTROL UNRESPONSIVE\n"
+         "[MANUAL OVERRIDE] ACCEPTED\n\n"
+         "You isolate the failed controller and open the bypass.\n\n"
+         "COOLANT FLOW  [##--------]  20%", 0.9),
+        ("[REPAIR] BYPASS RESPONDING\n"
+         "[CORE TEMPERATURE] FALLING\n\n"
+         "COOLANT FLOW  [########--]  80%\n\n"
+         "The readings begin to settle.", 0.8),
+        ("[REPAIR] STABILIZATION IN PROGRESS\n\n"
+         "           +----------------+\n"
+         "           |     SEALED     |\n"
+         "           |                |\n"
+         "           +----------------+\n\n"
+         "A heavy impact bends the door inward.\n"
+         "[DOOR INTEGRITY] 72%", 0.7),
+        ("[REPA_R] ST_BIL_ZATION IN PR_GRESS\n\n"
+         "           +-------/--------+\n"
+         "           |      /         |\n"
+         "           |     /          |\n"
+         "           +----------------+\n\n"
+         "[IMPACT] DETECTED\n[DOOR INTEGRITY] 38%", 0.15),
+        ("[REPAIR] STABILIZATION IN PROGRESS\n"
+         "[DOOR INTEGRITY] 38%\n\n"
+         "The display recovers. Another impact tears a hinge loose.", 0.55),
+        ("[DOOR INTEGRITY] 0%\n[WARNING] CONTAINMENT BREACH\n\n"
+         "     /---/                         __\n"
+         "    / o o\\                       /oo\\\n"
+         "   /  ___ \\                 ____/|  |\\____\n"
+         "  / /     \\ \\                  /|__|\\\n"
+         " /_/       \\_\\                / /  \\ \\\n\n"
+         "The Ghost slips through the broken frame.\n"
+         "The Hunter forces the rest of the door aside.\n"
+         "You reach for the controls. Neither lets you finish.", 0.9),
+        ("", 0.2),
+        ("YOU DIED.", 1.0),
     ]
+    play_reactor_frames(frames)
 
-    time.sleep(1)
 
-    for i, frame in enumerate(frames):
-        os.system("cls" if os.name == "nt" else "clear")
-        print(frame, flush=True)
+def reactor_decision():
+    """Checkpoint: retries stay here without consuming a combat turn."""
+    attempts = 0
+    feedback = ""
+    while True:
+        lines = ["[WARNING] REACTOR UNSTABLE", "",
+                 "Coolant control has failed. Core temperature is rising.",
+                 "", "[1] Attempt to repair the reactor", "[2] Do nothing"]
+        if feedback:
+            lines += ["", feedback]
+        choice = panel_answer(lines, "Choose 1 or 2, then press Enter > ")
+        if choice == "2":
+            return
+        if choice != "1":
+            feedback = "Invalid choice. Enter 1 or 2."
+            continue
+        attempts += 1
+        reactor_repair_animation()
+        lines = ["YOU DIED.", ""]
+        if attempts >= 2:
+            lines += ["You don't learn, do you?", ""]
+        lines += ["CHECKPOINT: REACTOR CONTROL PANEL",
+                  "Both engines remain repaired."]
+        panel_answer(lines, "Press Enter to return to the decision > ", 0)
+        feedback = ""
 
-        if i < 2:
-            time.sleep(0.8)
-        elif i < 5:
-            time.sleep(0.35)
-        else:
-            time.sleep(1.2)
+
+def explosion_animation():
+    frames = [
+        ("[REACTOR] NO CORRECTIVE ACTION\n\n"
+         "You leave the controls untouched.\n"
+         "The temperature continues to rise.\n\n"
+         "TEMPERATURE  [######----]\nPRESSURE     [#####-----]", 0.8),
+        ("[EMERGENCY] COOLANT BOILING\n"
+         "[WARNING] PRESSURE LIMIT EXCEEDED\n\n"
+         "TEMPERATURE  [#########-]\nPRESSURE     [##########]\n\n"
+         "The deck shakes beneath your feet.", 0.7),
+        ("[EMERGENCY] CORE FAILURE IMMINENT\n\n"
+         "                   3\n\n"
+         "[EVACUATION] NO SAFE ROUTE", 0.65),
+        ("[EMERGENCY] CORE FAILURE IMMINENT\n\n"
+         "                   2\n\n"
+         "[PRESSURE] SENSOR FAILURE", 0.65),
+        ("[EMERGENCY] CORE FAILURE IMMINENT\n\n"
+         "                   1\n\n"
+         "[CONTAINMENT] LOST", 0.65),
+        (r"""[CRITICAL] CORE COLLAPSE
+
+                   \ | /
+                    \|/
+             _______*_______
+        ____/______###______\____
+       /__________#####__________\
+       \____________*____________/
+
+The reactor casing splits. You have nowhere to go.""", 0.55),
+        (r"""                 \    |    /
+             .    \   |   /    .
+                 **#######**
+          .   ***###########***   .
+       ------###################------
+          .   ***###########***   .
+                 **#######**
+             .    /   |   \    .
+                 /    |    \
+
+              REACTOR BREACH""", 0.4),
+        (r"""     /___       #         ___\
+          \       *      /
+   #          __/   \__          #
+         .       ***        .
+  <<<<<<<<<<     ***     >>>>>>>>>>
+         .                  .
+
+The ship tears apart.
+You and the creatures aboard are caught in the blast.""", 0.8),
+        (r"""  <<<<<<<<                     >>>>>>>>
+
+    /\       /\       /\       /\
+   /  \     /  \     /  \     /  \
+  -----------\--------/-------------
+       /       \    /       \
+
+The shockwave flattens the trees around the wreck.
+Much of the surrounding forest is destroyed.""", 0.9),
+        ("       .                        .\n"
+         "                 *\n\n"
+         "   .                    .\n\n"
+         "Fragments fall through the smoke.", 0.6),
+        ("                         .\n\n\n\nSilence.", 0.8),
+        ("THE END.", 0.8),
+    ]
+    play_reactor_frames(frames)
+    panel_answer(["THE END.", "", "You died in the reactor explosion.",
+                  "The Ghost and Hunter were destroyed aboard the ship.",
+                  "Much of the surrounding forest is gone.", "",
+                  "To restart, run this Python file again."],
+                 "Press Enter to exit > ", 0)
 
 
 if clear_first_level:
@@ -1366,7 +1501,6 @@ if clear_first_level:
             msg = "Invalid input."
 
         if level_2_clear:
-            draw_level_2("You activate the reactor. There is no turning back.")
             explosion_animation()
             break
 
