@@ -1,7 +1,7 @@
-# ENGG1330-Project
+# Project Containment
 Year 1 Sem 1 ENGG1330 Project
 ======================================================
-PROJECT SURVIVAL: STRATEGY & MECHANICS GUIDE
+PROJECT CONTAINMENT: STRATEGY & MECHANICS GUIDE
 ======================================================
 
 Welcome to the dark. This game is designed to be punishing but fair. Surviving the forest and the crashed ship requires route planning, resource management, and a deep understanding of how the enemy AI tracks you.
@@ -54,3 +54,30 @@ Once you reach the exit (>), you enter the crashed ship.
 *   Your flashlight will continue to drain until one of the engines is online. Move with purpose.
 *   Once the engine fires, the emergency lights come on (stopping battery drain), and once both the engines are on the Ghost and Hunter board the ship. You must navigate the tight corridors, dodge the aliens, and reach the Reactor [R] to initiate the self-destruct sequence.
 
+## Running the game
+
+Run `python3 movement_logic.py` in a terminal at least 80 columns by 24 rows.
+Press Enter on the title screen to start. For playtesting, add `--debug`
+to start directly in the forest or ship.
+
+## Code layout
+
+- `movement_logic.py` starts the game and runs the forest and ship loops.
+- `game_maps.py` contains the layouts used in play.
+- `intro.py` and `endings.py` handle the story and finale screens.
+- `terminal_ui.py` and `turn_input.py` handle display sizing and input.
+- `engine_puzzles.py` contains the repair rules and hints.
+
+## Contribution record
+
+The entries below describe work visible in the repository history.
+
+- **Ahmed**: Core movement, traps, flashlight stun, coin pickups, ship
+  map updates, enemy behavior in the shop, and the strategy guide.
+- **Ahnaf**: Forest layout updates, opening narration and help cues,
+  the forest secret ending sequence, and the reactor sequence.
+- **Eric Dai**: Shop implementation and status display, level 2 work,
+  and terminal resize handling.
+- **Hongkang Liu (Louis)**: First-floor map proposal, linked engine puzzles
+  and hints, single-key controls, player guidance and map markers, input
+  validation, terminal playtesting, title screen, and the module split.

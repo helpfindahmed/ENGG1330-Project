@@ -99,3 +99,16 @@ Generative AI used: Yes
   Clarified the opening's playable objective and corrected the README's
   grace-period and battery guidance. Rechecked the full revised build in
   the same offline course v03 container at 80 by 24.
+
+## Entry
+
+- Member and date: Hongkang Liu, 13 November 2026.
+- Tool and model/version: OpenAI Codex. Exact model version was not recorded.
+- Purpose: Add the title screen and reorganize the game for team review.
+- Substantial parts affected: Title and startup in `movement_logic.py`, extracted
+  maps, narrative screens and terminal helpers, forest ending text, and the
+  README contribution record based on Git history.
+- How results were checked: Compared the extracted maps with the original
+  layouts. Tested start and quit from the title, the debug forest start,
+  the optional forest ending, and the route from the title to the reactor
+  at 80 by 24.
