@@ -988,7 +988,7 @@ ship_map = [
     "#.......####........#######..............####..........#",
     "#...................#######.............................#",
     "#.......####.............................####............#",
-    "[R].....####........@....................####..........>...#",
+    "[R].....####.............................####..........>...#",
     "#.......####.............................####............#",
     "#...................#######.............................#",
     "#.......####........#######..............####..........#",
@@ -1406,25 +1406,14 @@ if clear_first_level:
 
     enemies_active = False
     level_2_clear = False
-    ship_entry = next(
-        (
-            (x, y)
-            for y, row in enumerate(engine_1_map)
-            for x, tile in enumerate(row)
-            if tile == "<"
-        ),
-        None,
-    )
-    if ship_entry is None:
-        raise ValueError("Engine map is missing its first < entry tile.")
-    return_position = ship_entry
+    return_position = (55, 9)
 
     s["grid"] = maps["ship"]
-    s["px"], s["py"] = ship_entry
+    s["px"] = 55
+    s["py"] = 9
 
     s["tl"] = []
     s["aliens"] = [[50, 6], [40, 8]]
-    maps["ship"][9][20] = "."
 
     alien_names = ["GHOST", "HUNTER"]
     alien_stunned = [0, 0]
