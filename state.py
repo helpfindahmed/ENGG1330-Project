@@ -50,3 +50,16 @@ def trap_at(x, y):
         if t["tx"] == x and t["ty"] == y and t["triggered"]:
             return t
     return None
+
+def near_tile(symbol):
+    positions = [
+        (s["px"] + 1, s["py"]),
+        (s["px"] - 1, s["py"]),
+        (s["px"], s["py"] + 1),
+        (s["px"], s["py"] - 1),
+    ]
+    for x, y in positions:
+        if 0 <= y < len(s["grid"]) and 0 <= x < len(s["grid"][y]):
+            if s["grid"][y][x] == symbol:
+                return True
+    return False

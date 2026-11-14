@@ -3,6 +3,29 @@ import sys
 import time
 import textwrap
 
+def play_introduction():
+    """Temporarily suppress input echo; always restore it before gameplay."""
+    saved_input = None
+    try:
+        if sys.stdin.isatty() and os.name != "nt":
+            import termios
+            saved_input = termios.tcgetattr(sys.stdin.fileno())
+            settings = termios.tcgetattr(sys.stdin.fileno())
+            settings[3] &= ~(termios.ECHO | termios.ECHONL | termios.ICANON)
+            settings[6][termios.VMIN] = 1
+            settings[6][termios.VTIME] = 0
+            termios.tcsetattr(sys.stdin.fileno(), termios.TCSAFLUSH, settings)
+        sys.stdout.write("\033[?25l")
+        intro_story()
+    except (EOFError, KeyboardInterrupt):
+        raise SystemExit(0)
+    finally:
+        if saved_input is not None:
+            termios.tcsetattr(sys.stdin.fileno(), termios.TCSAFLUSH, saved_input)
+        sys.stdout.write("\033[?25h\033[H")
+        sys.stdout.flush()
+
+
 
 def intro_terminal_size():
     try:
@@ -96,7 +119,7 @@ def intro_frame(text, start=0):
 def intro_timed_frame(lines, seconds):
     if len(lines) > 18 or any(len(line) > 72 for line in lines):
         raise ValueError("Introduction animation exceeds its text area")
-    remaining = seconds
+    remaining = seconds * 2.2
     previous_size = None
     while remaining > 0:
         size = intro_terminal_size()

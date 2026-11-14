@@ -4,6 +4,7 @@ import textwrap
 
 # Pull in the terminal sizing tools you moved to cinematics
 from cinematics import intro_terminal_size, intro_draw, _intro_key
+from turn_input import read_turn
 
 MAP_COLORS = {
     "@": "96", "☺": "96",
@@ -99,3 +100,12 @@ def panel_answer(lines, prompt="Setting > ", max_length=16):
     finally:
         if saved is not None:
             termios.tcsetattr(sys.stdin.fileno(), termios.TCSANOW, saved)
+
+def read_map_turn(redraw):
+    while True:
+        if terminal_ready():
+            move = read_turn()
+            if move == "X" or terminal_ready():
+                return move
+        panel_answer(["Terminal resized. Press Enter to resume."], "Continue > ", 0)
+        redraw()

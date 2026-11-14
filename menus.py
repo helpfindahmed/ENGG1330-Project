@@ -131,3 +131,16 @@ def debug_menu():
             return command or "full"
         feedback = ["", "Unknown command. Use forest, ship, or press Enter."]
 
+def confirm_forest_exit(question):
+    """A confirmation never spends resources or advances the combat clock."""
+    feedback = ""
+    while True:
+        lines = [question, "", "[1] Yes", "[2] No"]
+        if feedback:
+            lines += ["", feedback]
+        choice = panel_answer(lines, "Choose 1 or 2, then press Enter > ")
+        if choice in ("1", "2"):
+            return choice == "1"
+        feedback = "Invalid choice. Enter 1 or 2."
+
+
