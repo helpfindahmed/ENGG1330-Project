@@ -75,8 +75,6 @@ Once you reach the exit (>), you enter the crashed ship.
   bugs during development.
 - Developed the game's backstory and wrote and implemented the in-game
   dialogues    
-- Created the initial UI changes, which Hongkang Liu (Louis) later refined
-  and improved. 
 - Added clearer feedback when obstacles block movement.
 - Added the debug menu and checkpoints to access different parts of the game
   during development.
