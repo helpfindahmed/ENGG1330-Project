@@ -14,7 +14,7 @@ def main_menu():
         r" | |_) | |___ / ___ \ |___| . \ |_| | |_| | | |  ",
         r" |____/|_____/_/   \_\____|_|\_\___/ \___/  |_|  ",
         "",
-        "A ENGG1330 Project",
+        "An ENGG1330 Project",
         "",
         "[1] New Game",
         "[2] Survival Manual",
