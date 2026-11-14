@@ -9,7 +9,7 @@ Generative AI used: Yes
 - Purpose: Design two linked engine repairs and integrate them into the existing
   ship level.
 - Substantial parts affected: `engine_puzzles.py` and the engine interaction
-  and instructions in `movement_logic.py`.
+  and instructions in `main.py`.
 - What was kept, changed, or rejected: Added relay ordering for Engine 1 and
   used its ignition slot as a fuel valve clue for Engine 2. Kept the team's
   ship maps, flashlight carryover, enemy activation and reactor ending.
@@ -33,7 +33,7 @@ Generative AI used: Yes
 - Tool and model/version: OpenAI Codex. Exact model version was not recorded.
 - Purpose: Prototype direct WASD input and integrate it after testing.
 - Substantial parts affected: `direct_wasd_demo.py`, `turn_input.py` and the
-  movement input in `movement_logic.py`.
+  movement input in `main.py`.
 - What was kept and how it was checked: Movement and flash attacks advance
   one command at a time. Text prompts still submit with Enter. Tested the
   separate demo in a macOS terminal session before integrating it. Replayed
@@ -46,7 +46,7 @@ Generative AI used: Yes
 - Tool and model/version: OpenAI Codex. Exact model version was not recorded.
 - Purpose: Integrate progressive hints with the team's new ship screens and
   add Windows single-key movement.
-- Substantial parts affected: Engine panel interaction in `movement_logic.py`
+- Substantial parts affected: Engine panel interaction in `main.py`
   and console input in `turn_input.py`.
 - What was kept and how it was checked: Kept the team's updated map, fixed-size
   panel renderer, and power restoration after the upper engine. Replayed both
@@ -60,7 +60,7 @@ Generative AI used: Yes
 - Member and date: Hongkang Liu, 11 November 2026.
 - Tool and model/version: OpenAI Codex. Exact model version was not recorded.
 - Purpose: Fix issues found in the pre-push review.
-- Substantial parts affected: The ship display in `movement_logic.py`, the
+- Substantial parts affected: The ship display in `main.py`, the
   upper engine hint in `engine_puzzles.py`, and Escape handling in
   `turn_input.py`.
 - How results were checked: Replayed both engine repairs, boarding enemies
@@ -74,7 +74,7 @@ Generative AI used: Yes
 - Tool and model/version: OpenAI Codex. Exact model version was not recorded.
 - Purpose: Improve first-time player guidance and feedback on invalid input.
 - Substantial parts affected: Briefings, objectives, map rendering, and panel
-  feedback in `movement_logic.py` and turn input in `turn_input.py`.
+  feedback in `main.py` and turn input in `turn_input.py`.
 - How results were checked: Played from the opening story to the reactor
   ending on macOS with colour enabled and disabled. All 191 forest and ship
   map frames in each run fit 80 by 24. Compared all five maps against the
