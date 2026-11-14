@@ -94,7 +94,9 @@ def intro_frame(text, start=0):
     steps = intro_steps(text)
     index = min(start, len(steps) - 1)
     prompt = "Enter to continue | Backspace to go back | Ctrl+C to quit"
-    interactive = sys.stdin.isatty()
+    interactive = sys.stdin.isatty() or (
+        os.name == "nt" and sys.stdout.isatty()
+    )
     previous = None
     while True:
         size = intro_terminal_size()
@@ -160,31 +162,45 @@ def play_reactor_frames(frames):
         sys.stdout.flush()
 
 def intro_story():
-    """Short narrative pages with Enter and Backspace navigation."""
+    """narrative pages with Enter and Backspace navigation."""
     frames = [
         (
-            'You are a spacecraft systems engineer. Your employer sends you '
-            'between planets to fix equipment nobody bothers maintaining.\n'
+            'You are a spacecraft systems engineer.\n'
             '\n'
-            'You don’t get paid enough for this, but you do get paid.\n'
+            'Six years ago, “travel between planets” on your resume sounded like a perk.\n'
             '\n'
-            'That has kept you here for six years.\n'
+            'Your employer has since done a lot to correct that impression.\n'
             '\n'
-            'Today’s job is an overheating mining plant. Someone installed the'
-            ' coolant regulator backwards.\n'
+            'Today, a mining plant has stopped working. The site manager '
+            'swears nobody touched anything.\n'
             '\n'
-            'Your supervisor has allowed two hours.\n'
-            'Travel, apparently, is something you do in your spare time.'
+            'He has attached a photograph of a coolant regulator '
+            'installed backwards.\n'
+            '\n'
+            'You could explain this over a call, but they requested '
+            'an engineer. So now you have to go to another planet '
+            'and turn something around.\n'
+            '\n'
+            'Two hours’ pay. Travel not included.\n'
+            '\n'
+            'You accept the job. Rent remains annoyingly non-negotiable.'
         ),
         (
-            'Halfway there, the ship changes course.\n'
+            'You board the ship and prepare for the journey.\n'
+            '\n'
+            '[SYSTEMS] ALL SYSTEMS NOMINAL\n'
             '\n'
             '[NAVIGATION] UNSCHEDULED COURSE CORRECTION\n'
             '\n'
-            'You cancel it. The ship turns again.\n'
+            '????\n'
             '\n'
-            'You switch to manual control, but the navigation display keeps '
-            'jumping. An unidentified planet fills the window.\n'
+            'You switch to manual control. The controls respond a second too '
+            'late.\n'
+            '\n'
+            'The navigation display jumps from one star chart to the next.\n'
+            '\n'
+            'The route eventually disappears, replaced by an unidentified planet '
+            'filling the window.\n'
             '\n'
             '[WARNING] ATMOSPHERIC ENTRY IMMINENT\n'
             '\n'
@@ -209,11 +225,12 @@ def intro_story():
             'roots and fallen branches.\n'
             '\n'
             'Each detour takes you farther from the ship.\n'
-            'Then the signal disappears.\n'
+            '\n'
+            'The signal disappears.\n'
             '\n'
             '[ROUTE GUIDANCE] RECALCULATING\n'
             '\n'
-            'You climb a slope to recover it. When you turn back, you cannot '
+            'You climb a slope to recover the signal. When you turn back, you cannot '
             'find the path you came from.\n'
             '\n'
             'You check your recorded route.\n'
@@ -236,9 +253,12 @@ def intro_story():
             'You would have preferred a less reliable warning earlier.'
         ),
         (
-            'It is getting dark. Something moves behind the trees.\n'
+            'It is getting dark. You hear something moving behind the trees.\n'
             '\n'
             'You stop looking for the regulator.\n'
+            '\n'
+            'You are lost in the forest.\n'
+            '\n'
             'You need to get back to the ship.\n'
             '\n'
             'The navigation system cannot tell you how.\n'
