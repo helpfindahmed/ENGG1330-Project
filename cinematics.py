@@ -318,7 +318,7 @@ def explosion_animation():
         ("[EMERGENCY] COOLANT BOILING\n"
          "[WARNING] PRESSURE LIMIT EXCEEDED\n\n"
          "TEMPERATURE  [#########-]\nPRESSURE     [##########]\n\n"
-         "The deck shakes beneath your feet.", 0.7),
+         "The deck shakes beneath your feet.", 1.2),
         ("[EMERGENCY] CORE FAILURE IMMINENT\n\n"
          "                   3\n\n"
          "[EVACUATION] NO SAFE ROUTE", 0.65),
@@ -337,7 +337,7 @@ def explosion_animation():
        /__________#####__________\
        \____________*____________/
 
-The reactor casing splits. You have nowhere to go.""", 0.55),
+The reactor casing splits. You have nowhere to go.""", 0.75),
         (r"""                 \    |    /
              .    \   |   /    .
                  **#######**
@@ -357,7 +357,7 @@ The reactor casing splits. You have nowhere to go.""", 0.55),
          .                  .
 
 The ship tears apart.
-You and the creatures aboard are caught in the blast.""", 0.8),
+You and the creatures aboard are caught in the blast.""", 0.9),
         (r"""  <<<<<<<<                     >>>>>>>>
 
     /\       /\       /\       /\
@@ -366,11 +366,11 @@ You and the creatures aboard are caught in the blast.""", 0.8),
        /       \    /       \
 
 The shockwave flattens the trees around the wreck.
-Much of the surrounding forest is destroyed.""", 0.9),
+Much of the surrounding forest is destroyed.""", 1.0),
         ("       .                        .\n"
          "                 *\n\n"
          "   .                    .\n\n"
-         "Fragments fall through the smoke.", 0.6),
+         "Fragments fall through the smoke.", 0.9),
         ("                         .\n\n\n\nSilence.", 0.8),
         ("THE END.", 0.8),
     ]
@@ -386,23 +386,24 @@ def reactor_repair_animation():
         ("[REPAIR] BYPASS RESPONDING\n"
          "[CORE TEMPERATURE] FALLING\n\n"
          "COOLANT FLOW  [########--]  80%\n\n"
-         "The readings begin to settle.", 0.8),
+         "The readings begin to settle.", 0.9),
         ("[REPAIR] STABILIZATION IN PROGRESS\n\n"
          "           +----------------+\n"
          "           |     SEALED     |\n"
          "           |                |\n"
          "           +----------------+\n\n"
          "A heavy impact bends the door inward.\n"
-         "[DOOR INTEGRITY] 72%", 0.7),
+         "[DOOR INTEGRITY] 72%", 0.9),
         ("[REPA_R] ST_BIL_ZATION IN PR_GRESS\n\n"
          "           +-------/--------+\n"
          "           |      /         |\n"
          "           |     /          |\n"
          "           +----------------+\n\n"
-         "[IMPACT] DETECTED\n[DOOR INTEGRITY] 38%", 0.15),
+         "A sudden jolt shakes the entire structure.\n"
+         "[IMPACT] DETECTED\n[DOOR INTEGRITY] 38%", 1.2),
         ("[REPAIR] STABILIZATION IN PROGRESS\n"
          "[DOOR INTEGRITY] 38%\n\n"
-         "The display recovers. Another impact tears a hinge loose.", 0.55),
+         "The display recovers. Another impact tears a hinge loose.", 0.9),
         ("[DOOR INTEGRITY] 0%\n[WARNING] CONTAINMENT BREACH\n\n"
          "     /---/                         __\n"
          "    / o o\\                       /oo\\\n"
@@ -411,8 +412,8 @@ def reactor_repair_animation():
          " /_/       \\_\\                / /  \\ \\\n\n"
          "The Ghost slips through the broken frame.\n"
          "The Hunter forces the rest of the door aside.\n"
-         "You reach for the controls. Neither lets you finish.", 0.9),
-        ("", 0.2),
+         "You reach for the controls. Neither lets you finish.", 2.5),
+        ("", 0.9),
         ("YOU DIED.", 1.0),
     ]
     play_reactor_frames(frames)
@@ -432,7 +433,7 @@ def secret_ending():
             termios.tcsetattr(sys.stdin.fileno(), termios.TCSAFLUSH, settings)
         sys.stdout.write("\033[?25l")
         intro_timed_frame(['   /\\    /\\       /\\', '  /##\\  /  \\  ## /  \\',
-                           "  ||    ||   []    ||", "[DISPLAY] SYNC LOST"], 0.15)
+                           "  ||    ||   []    ||", "[DISPLAY] SYNC LOST"], 0.8)
         intro_timed_frame(["#  []  ##   --   []", "   ##       #  #", "[DI$PLAY] -- --"], 0.12)
         intro_timed_frame([], 0.7)
         intro_timed_frame(["YOU DIED."], 1.2)
