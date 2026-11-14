@@ -112,3 +112,22 @@ Generative AI used: Yes
   debug menu, repaired both engines, tested invalid input and progressive
   hints, and reached the reactor ending. All 136 captured gameplay screens
   in this run fit 80 columns by 24 rows.
+
+## Entry
+
+- Member and date: Syed Ahnaf Akif, 11 November 2026.
+- Tool and model/version: OpenAI ChatGPT/Codex. Exact model version was not recorded.
+- Purpose: Refine existing Hunter logic and assist with debug tools, dialogue,
+  terminal presentation, and cinematic sequences.
+- Substantial parts affected: Hunter behaviour in alien_logic.py, debug
+  menu and checkpoint handling, shop positioning, dialogue and help-menu
+  unlocking, UI feedback, and animations in cinematics.py.
+- What was kept, changed, or rejected: Developed the original Hunter logic
+  and used AI to refine my existing code. Used AI assistance to create the debug
+  menu and checkpoints and to keep the shop in its existing position during
+  code changes. Used AI to revise the backstory and dialogue implementations.
+  Used AI for the reactor animations and other animations throughout the game.
+  AI assistance was used in implementing the secret ending,
+  reactor choices, and checkpoint sequence from my requirements.
+- How results were checked: Reviewed the current uploaded code and earlier
+  development changes to identify retained features for these entries.
