@@ -75,24 +75,32 @@ def _intro_key(interactive, ready, size):
     return ""
 
 def intro_steps(text):
-    """Show entire page at once instead of sentence-by-sentence reveals."""
+    """Paginate whole paragraphs within the 72-column, 18-row text area."""
+    pages = []
     lines = []
     for paragraph in text.split("\n\n"):
         if not paragraph.strip():
             continue
+        wrapped = []
         for part in paragraph.splitlines():
-            added = textwrap.wrap(part, width=72) or [""]
-            lines.extend(added)
-        lines.append("")
-    if lines and lines[-1] == "":
-        lines.pop()
-    if len(lines) > 18:
-        raise ValueError("Introduction page exceeds its text area")
-    return [lines]
+            wrapped.extend(textwrap.wrap(part, width=72) or [""])
+        if lines and len(lines) + 1 + len(wrapped) > 18:
+            pages.append(lines)
+            lines = []
+        # A paragraph longer than a screen must continue on another page.
+        while len(wrapped) > 18:
+            pages.append(wrapped[:18])
+            wrapped = wrapped[18:]
+        if lines:
+            lines.append("")
+        lines.extend(wrapped)
+    if lines:
+        pages.append(lines)
+    return pages or [[]]
 
 def intro_frame(text, start=0):
     steps = intro_steps(text)
-    index = min(start, len(steps) - 1)
+    index = len(steps) - 1 if start < 0 else min(start, len(steps) - 1)
     prompt = "Enter to continue | Backspace to go back | Ctrl+C to quit"
     interactive = sys.stdin.isatty() or (
         os.name == "nt" and sys.stdout.isatty()
@@ -280,6 +288,7 @@ def intro_story():
         ['[CRITICAL] IMPACT DETECTED', '', '  +------------------------------------------------------+', '  |          \\                    /                      |', '  |           \\       |          /                       |', '  |------------\\------*---------/-------------------------|', '  |             \\   / | \\     /                          |', '  |              \\ /  |  \\___/                           |', '  |               /   |      \\                           |', '  +------------------------------------------------------+', '', '[FLIGHT RECORDER] SIGNAL L—'],
     ]
     index = 0
+    start = 0
     while index < len(frames):
         if index == 2:
             for lines, delay in zip(crash_frames, (0.2, 0.2, 0.15)):
@@ -292,11 +301,13 @@ def intro_story():
             for notice in notices.splitlines():
                 lines.append(notice)
                 intro_timed_frame(lines, 0.4)
-        result = intro_frame(frames[index], start=1 if index == 4 else 0)
+        result = intro_frame(frames[index], start=start)
         if result == "back":
+            start = -1 if index > 0 else 0
             index = max(0, index - 1)
         else:
             index += 1
+            start = 0
 
 def explosion_animation():
     frames = [
