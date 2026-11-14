@@ -52,8 +52,8 @@ Generative AI used: Yes
   panel renderer, and power restoration after the upper engine. Replayed both
   repairs in an 80 by 24 macOS terminal and checked hint progression, retry and
   reopen behavior, and flashlight drain before and after the first repair.
-  Checked Windows command handling with simulated console input. A native
-  Windows console test remains pending.
+  Checked Windows command handling with simulated console input. The later entry records the
+  native Windows console test on the updated build.
 
 ## Entry
 
@@ -92,10 +92,23 @@ Generative AI used: Yes
   both the smiley and the explicit ASCII fallback stay aligned on Windows
   and Ubuntu at 80 by 24.
   Rebuilt the course Docker v03 image from the provided bundle and replayed
-  the current game from the opening through the reactor ending in a fresh
+  the pre-refactor build from the opening through the reactor ending in a fresh
   container with networking disabled. All 191 captured forest and ship map
   frames fit 80 by 24. The run covered invalid input, terminal resizing,
   engine retries, and battery behavior after the upper engine repair.
   Clarified the opening's playable objective and corrected the README's
   grace-period and battery guidance. Rechecked the full revised build in
   the same offline course v03 container at 80 by 24.
+
+
+## Entry
+
+- Member and date: Hongkang Liu, 14 November 2026.
+- Tool and model/version: OpenAI Codex. Exact model version was not recorded.
+- Purpose: Check that my engine puzzles and player guidance carried over into
+  Blackout, and document my contributions using the repository history.
+- Substantial parts affected: My contribution entry in `README.md` and this log.
+- How results were checked: On macOS, started Blackout at the ship using the
+  debug menu, repaired both engines, tested invalid input and progressive
+  hints, and reached the reactor ending. All 136 captured gameplay screens
+  in this run fit 80 columns by 24 rows.

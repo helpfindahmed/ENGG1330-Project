@@ -54,3 +54,18 @@ Once you reach the exit (>), you enter the crashed ship.
 *   Your flashlight will continue to drain until one of the engines is online. Move with purpose.
 *   Once the engine fires, the emergency lights come on (stopping battery drain), and once both the engines are on the Ghost and Hunter board the ship. You must navigate the tight corridors, dodge the aliens, and reach the Reactor [R] to initiate the self-destruct sequence.
 
+## Member contributions
+
+### Hongkang Liu (Louis)
+
+- Drafted a first-floor map proposal and improved map readability with a
+  distinct player marker, labeled engine-room entrances, and an ASCII fallback.
+- Designed and implemented the two linked ship engine puzzles, including
+  repair status, progressive hints, and retries within the puzzle panels.
+- Added single-key turn-based movement and improved feedback for blocked moves,
+  invalid commands, and menu input. Added in-game briefings and next objectives
+  for the forest, engine rooms, and reactor.
+- Playtested terminal controls on macOS, Windows, and Linux and verified
+  the earlier integrated build in the offline course Docker container.
+  Rechecked the ship route on Blackout after the module split at 80 columns
+  by 24 rows.
