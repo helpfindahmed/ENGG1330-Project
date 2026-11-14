@@ -69,3 +69,19 @@ Once you reach the exit (>), you enter the crashed ship.
   the earlier integrated build in the offline course Docker container.
   Rechecked the ship route on Blackout after the module split at 80 columns
   by 24 rows.
+
+### Syed Ahnaf Akif
+- Developed the Hunter's pursuit logic and fixed pre-existing
+  bugs during development.
+- Developed the game's backstory and wrote and implemented the in-game
+  dialogues    
+- Created the initial UI changes, which Hongkang Liu (Louis) later refined
+  and improved. 
+- Added clearer feedback when obstacles block movement.
+- Added the debug menu and checkpoints to access different parts of the game
+  during development.
+- Implemented the forest exit confirmations and the secret ending
+- Implemented the reactor sequence, both reactor choices, the repair-death
+  checkpoint, repeated-attempt dialogue, and explosion ending.
+- Added help-menu unlocking through interaction with the help terminal.
+  AI assistance used during development is recorded in ai_use.md.
