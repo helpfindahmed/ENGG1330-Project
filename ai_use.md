@@ -115,19 +115,108 @@ Generative AI used: Yes
 
 ## Entry
 
-- Member and date: Syed Ahnaf Akif, 11 November 2026.
-- Tool and model/version: OpenAI ChatGPT/Codex. Exact model version was not recorded.
-- Purpose: Refine existing Hunter logic and assist with debug tools, dialogue,
-  terminal presentation, and cinematic sequences.
-- Substantial parts affected: Hunter behaviour in alien_logic.py, debug
-  menu and checkpoint handling, shop positioning, dialogue and help-menu
-  unlocking, UI feedback, and animations in cinematics.py.
+- Member and date: Syed Ahnaf Akif, 15 November 2026 (An expanded retrospective
+  record of work previously disclosed on 11 November 2026).
+- Tool and model/version: OpenAI ChatGPT/Codex. Exact model versions were not recorded.
+- Purpose: Refine my existing Hunter pursuit logic and assist with debugging.
+- Substantial parts affected: Hunter behaviour in `alien_logic.py` and its
+  supporting state and movement code, adapted from the earlier single-file game.
 - What was kept, changed, or rejected: Developed the original Hunter logic
-  and used AI to refine my existing code. Used AI assistance to create the debug
-  menu and checkpoints and to keep the shop in its existing position during
-  code changes. Used AI to revise the backstory and dialogue implementations.
-  Used AI for the reactor animations and other animations throughout the game.
-  AI assistance was used in implementing the secret ending,
-  reactor choices, and checkpoint sequence from my requirements.
-- How results were checked: Reviewed the current uploaded code and earlier
-  development changes to identify retained features for these entries.
+  and used AI to refine the implementation. Kept direct pursuit of the
+  player's current position and shortest-path routing around obstacles.
+  Required preservation of existing maps, resources, and unrelated mechanics.
+- How results were checked: Reviewed source comparisons and integration changes.
+  Later manual checks were performed for shortest-path detours, unreachable
+  goals, identical start and goal, Hunter targeting, movement at distances
+  8 and 9, and the eight-turn forest grace period.
+
+## Entry
+
+- Member and date: Syed Ahnaf Akif, 15 November 2026 (A retrospective record).
+- Tool and model/version: OpenAI ChatGPT/Codex. Exact model versions were not recorded.
+- Purpose: Refine and implement my backstory, dialogue, obstacle feedback,
+  help-menu unlocking, and cinematic presentation.
+- Substantial parts affected: `cinematics.py`, `level_forest.py`,
+  `level_ship.py`, `menus.py`, `state.py`, and shared display helpers in `ui.py`.
+- What was kept, changed, or rejected: Developed the backstory and dialogue,
+  personally revised the text, and used AI to help refine and integrate it.
+  Rejected generic names, excessive exposition, and the typewriter effect.
+  Used AI for the narration animations, including assistance with the final
+  animated section. The current crash and warning use timed frames. Added obstacle feedback
+  and help unlocking with AI assistance during implementation and review.
+- How results were checked: Reviewed and revised the narrative drafts.
+  AI inspected message branches and blocked-movement handling,
+  and checked that opening the manual sets the help-unlocked flag. Review
+  also identified that opening the manual from the main menu unlocks H.
+  Cinematic size checks are recorded in the pagination entry below.
+
+## Entry
+
+- Member and date: Syed Ahnaf Akif, 15 November 2026 (A retrospective record).
+- Tool and model/version: OpenAI ChatGPT/Codex. Exact model versions were not recorded.
+- Purpose: Create debug entry points and preserve shop positioning during changes.
+- Substantial parts affected: `main.py`, `menus.py`, `state.py`, and
+  `level_forest.py`.
+- What was kept, changed, or rejected: Used AI assistance to create the debug
+  menu and development checkpoints. Retained full-game, forest, and ship
+  starts; these are level entry points rather than saved-game checkpoints.
+  Used AI to help retain the shop's existing position during map updates.
+- How results were checked: AI ran checks passed for invalid debug
+  input, case-insensitive commands, and Enter selecting the full game.
+  Reviewed the game-start branches and shop-coordinate restoration code.
+  No new shop playtest was performed for this review.
+
+## Entry
+
+- Member and date: Syed Ahnaf Akif, 15 November 2026 (retrospective record).
+- Tool and model/version: OpenAI ChatGPT/Codex. Exact model versions were not recorded.
+- Purpose: Implement forest exit confirmations, the secret ending, and
+  the reactor choices, checkpoint, and ending sequences.
+- Substantial parts affected: `menus.py`, `level_forest.py`, `level_ship.py`,
+  and `cinematics.py`, including their earlier single-file implementations.
+- What was kept, changed, or rejected: Specified the exit and ending behaviour
+  and used AI to assist with implementation. Kept Yes/No confirmations,
+  the secret-ending glitch and joke, repair-death retries, retained engine
+  progress, repeated-attempt dialogue, and the do-nothing explosion ending.
+  Used AI for the reactor animations and other cinematic effects.
+  Preserved the existing linked engine puzzles credited to Louis.
+- How results were checked: Reviewed exit handling, reactor prerequisites,
+  and the explosion call. AI ran checks confirmed that invalid
+  confirmation followed by No leaves shared state unchanged. Reactor checks
+  covered invalid input, two repair attempts, repeated-death dialogue, and
+  choosing to do nothing; shared state and repaired-engine flags were retained.
+
+## Entry
+
+- Member and date: Syed Ahnaf Akif, 15 November 2026.
+- Tool and model/version: OpenAI ChatGPT/Codex. Exact model version was not recorded.
+- Purpose: Fix narration overflow and keep cinematics within an 80 by 24 terminal.
+- Substantial parts affected: `intro_steps`, `intro_frame`, and `intro_story`
+  in `cinematics.py`.
+- What was kept, changed, or rejected: Supplied an error screenshot and
+  requested that overflowing paragraphs move to another page. Kept the
+  narration and story-event order. Used the AI-generated pagination fix
+  to limit each text page to 18 rows and 72 columns and preserve Enter and
+  Backspace navigation across pages and story sections.
+- How results were checked: Manual checks were performed for syntax, unchanged
+  narration, pagination without text loss, page navigation,
+  invalid-key handling, and resize messages. All 8 narration pages 
+  fitted the text area with room for the prompt.
+
+
+## Entry
+
+- Member and date: Syed Ahnaf Akif, 15 November 2026 (including documentation
+  assistance from 14 November 2026).
+- Tool and model/version: OpenAI ChatGPT/Codex. Exact model version was not recorded;
+- Purpose: Compare versions, document contributions and AI use.
+- Substantial parts affected: `README.md`, `ai_use.md`,
+- What was kept, changed, or rejected: Used AI to organise my contribution
+  account and document assistance.
+  Kept the distinction between my original work, AI assistance, and
+  teammates' contributions. Adapted this disclosure to the group's log format.
+- How results were checked: The assistant reviewed the uploaded source and
+  relevant earlier versions. All 11 latest Python modules passed syntax
+  compilation. Focused behavioural checks are recorded above. Documentation
+  was checked against my stated contributions and available evidence;
+  known code limitations were reported without changing gameplay.
