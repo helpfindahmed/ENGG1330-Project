@@ -39,7 +39,7 @@ for a perfectly reasonable reason.
 *   Completion: Repair both engines and resolve the reactor sequence. Its
     final explosion ends the game; attempting repair returns you to the
     decision after a scripted death. The secret exit in the forest provides
-    a separate, deliberately unfinished ending. None of these endings rescues
+    a separate ending. None of these endings rescues
     the player.
 *   Playtime: The design target is approximately 5–10 minutes. Reading speed,
     puzzle retries, and repeated repair attempts affect the actual duration.
