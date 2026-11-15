@@ -220,3 +220,172 @@ Generative AI used: Yes
   compilation. Focused behavioural checks are recorded above. Documentation
   was checked against my stated contributions and available evidence;
   known code limitations were reported without changing gameplay.
+
+  ## Entry
+
+- Member and date: Tianqi Dai, 9 November 2026.
+- Tool and model/version, where available: OpenAI ChatGPT. Exact model
+  version was not recorded.
+- Purpose: Prototype a recognisable ship map using simple terminal
+  characters.
+- Relevant prompts and outputs used, or retained transcript location:
+  In the conversation "Generating a Large Ship Map", requested:
+  "Generate a 60 by 24 map using simple characters and make it resemble
+  a large ship as closely as possible."
+  Follow-up prompts included:
+  "Add a visible outline of the ship's hull."
+  "Change the dimensions to 60 by 18."
+  ChatGPT supplied character-based ship layouts, including a revised
+  60-column by 18-row version with a visible hull and ship features.
+- Files/materials affected: The initial ship-map design and character-map
+  data for Level 2.
+- What we kept, changed or rejected: Kept the simple-character format and
+  recognisable ship outline. Changed the requested dimensions from
+  60 by 24 to 60 by 18 and requested a clearer ship-body outline.
+- How we checked it; tests and corrections: Reviewed the proposed
+  appearance and requested the hull and size revisions. ChatGPT described
+  the generated maps as matching the requested dimensions. No independent
+  row-by-row measurement log was retained for this design session.
+
+## Entry
+
+- Member and date: Tianqi Dai, 9 November 2026.
+- Tool and model/version, where available: OpenAI ChatGPT. Exact model
+  version was not recorded.
+- Purpose: Establish the ship-level structure and connect it to the
+  existing first level.
+- Relevant prompts and outputs used, or retained transcript location:
+  In the conversation "Branch: Generating a Large Ship Map", requested:
+  "I have already added a Boolean named clear_level_1. It becomes True
+  after the first level is completed. Use this to determine whether the
+  player can enter Level 2, and keep everything else unchanged."
+  Also requested:
+  "Follow the structure of the first-level code. The puzzles in the three
+  rooms do not need to be designed yet, but the room maps must load."
+  ChatGPT supplied a Level 2 prototype containing the ship, upper engine
+  room, lower engine room and reactor-room maps.
+- Files/materials affected: The original ship-level Python implementation,
+  room-map data and transition from Level 1 to Level 2. The final module
+  names were not established in this session.
+- What we kept, changed or rejected: Kept the existing clear_level_1 state
+  and first-level structure. Requested working room entry and map loading
+  while deferring room puzzles. This entry covers the level foundation,
+  not the later linked engine puzzles developed by another member.
+- How we checked it; tests and corrections: Subsequent gameplay
+  observations exposed exit-handling and engine-progression issues.
+  These were reported with screenshots and addressed in the next entry.
+  No complete automated integration-test record was retained for the
+  prototype.
+
+## Entry
+
+- Member and date: Tianqi Dai, 9 November 2026, with later manual checks
+  reported retrospectively.
+- Tool and model/version, where available: OpenAI ChatGPT. Exact model
+  version was not recorded.
+- Purpose: Add a character-based ship explosion animation after
+  reactor activation.
+- Relevant prompts and outputs used, or retained transcript location:
+  In the conversation "Branch: Generating a Large Ship Map", requested:
+  "Add a character-based animation of the ship exploding after the reactor
+  is activated. Give me a version that I can copy and paste directly."
+  ChatGPT supplied an explosion_animation() implementation and instructions
+  for inserting its call after reactor activation.
+- Files/materials affected: The prototype's ending-animation routine
+  and reactor activation sequence.
+- What we kept, changed or rejected: Used AI assistance for the requested
+  character-animation implementation and its insertion point. This
+  records assistance with the earlier prototype rather than claiming
+  ownership of all subsequent reactor choices or ending revisions.
+- How we checked it; tests and corrections: I later reported checking
+  the game and animation against the 80 by 24 terminal requirement and
+  testing execution inside Docker. Exact testing dates, container logs
+  and individual pass/fail results were not recorded in this conversation.
+  These were my reported checks, not tests independently run by ChatGPT.
+
+## Entry
+
+- Member and date: Tianqi Dai, 15 November 2026.
+- Tool and model/version, where available: OpenAI ChatGPT. Exact model
+  version was not recorded.
+- Purpose: Help produce a promotional trailer introducing the game's
+  functions and atmosphere.
+- Relevant prompts and outputs used, or retained transcript location:
+  In the conversation "Game Evaluation", requested assistance with
+  trailer production and supplied this reference video:
+  https://www.youtube.com/watch?v=KRvEFwHXm8s
+  The follow-up request was:
+  "Use the presentation style in this video as a reference, for example
+  the introduction before the 'Set a trap' section."
+  Outputs included BLACKOUT_Trailer_57s.mp4 and
+  BLACKOUT_Voiceover_Guide.txt.
+- Files/materials affected: The 57-second trailer, gameplay demonstrations,
+  feature-introduction sequences, audio presentation and accompanying
+  voiceover guide.
+- What we kept, changed or rejected: Used AI assistance to develop the
+  video and explain game functions through feature cards and gameplay
+  demonstrations. The initial delivered version was described as
+  including atmospheric audio without spoken narration. The voiceover
+  guide was a separate output.
+- How we checked it; tests and corrections: Reviewed the trailer's
+  presentation and gameplay demonstrations. Identified incorrect trap
+  placement and an unwanted character in the stun sequence, then
+  requested the corrections recorded below. No separate audio-quality
+  or encoding-test report was retained.
+
+## Entry
+
+- Member and date: Tianqi Dai, 15 November 2026.
+- Tool and model/version, where available: OpenAI ChatGPT. Exact model
+  version was not recorded.
+- Purpose: Correct two gameplay inaccuracies in the trailer.
+- Relevant prompts and outputs used, or retained transcript location:
+  In the conversation "Game Evaluation", requested:
+  "There is a problem in the 'Set a trap' section. You placed the trap
+  to the player's left, but it should be placed under the player's feet
+  and become active after the player moves away."
+  Also requested:
+  "In the 'Stun. Then Run!' section, there is an extra 'X' to the
+  player's left. Remove it."
+  ChatGPT returned a revised trailer and reported applying both
+  corrections.
+- Files/materials affected: The trap-placement and stun-demonstration
+  sequences in BLACKOUT_Trailer_57s.mp4.
+- What we kept, changed or rejected: Rejected the incorrect trap position
+  and unwanted "X". Explicitly requested:
+  "Only change these parts and keep everything else unchanged."
+  The correction pass was therefore limited to those two sequences.
+- How we checked it; tests and corrections: Compared the original
+  demonstrations with the intended game mechanics and identified the
+  two discrepancies through visual review. The assistant reported
+  completing the revision. A separate final acceptance review was
+  not recorded.
+
+## Entry
+
+- Member and date: Tianqi Dai, November 2026. 15 November, 2026.
+- Tool and model/version, where available: OpenAI ChatGPT. Exact model
+  version was not recorded.
+- Purpose: Refine the trailer's flashcards and surrounding visual style.
+- Relevant prompts and outputs used, or retained transcript location:
+  In the conversation "Game Evaluation", uploaded
+  "Black and White Minimalist Horror Mystery Presentation (1).png"
+  and requested:
+  "Remove the numerical labels from every flashcard and add animation
+  effects. Use the uploaded image as the style reference."
+  "Replace the first flashcard with the uploaded image and keep the
+  remaining flashcard content unchanged."
+  "Give the surrounding gameplay frame a similarly dark, mysterious
+  and suspenseful style. I mean the outer frame, not the background
+  of the central gameplay area."
+- Files/materials affected: The trailer's opening card, subsequent
+  flashcard presentation and outer gameplay frame, together with the
+  uploaded reference image.
+- What we kept, changed or rejected: Requested that the remaining
+  flashcard content stay unchanged. Asked for a darker surrounding
+  frame inspired by the reference while retaining the central gameplay
+  background. Rejected the numbered flashcard presentation.
+- How we checked it; tests and corrections: Used the uploaded image
+  as the visual reference and gave explicit constraints on which
+  areas could change. The available record confirms this request,
+  but does not confirm a completed revision or final visual acceptance.
