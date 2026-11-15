@@ -308,12 +308,6 @@ above are reproducible from the project itself.
 9. KNOWN LIMITATIONS
 ------------------------------------------------------
 
-*   The latest uploaded revision has not received a new full end-to-end course
-    Docker test in this review. The exact course image tag is not present in
-    the supplied files; use the official v03 course bundle and launch guidance.
-*   The 5–10 minute playtime is a target, not a measured completion guarantee.
-*   Gameplay dialogue is wrapped and limited to the available lines, so a long
-    combination of messages may be shortened. Story text instead paginates.
 *   Opening the manual from the main menu unlocks H before a forest terminal
     is visited. This follows the shared `open_terminal()` implementation.
 *   Ship startup assigns `alien_logic.turn = 0`, while the active enemy counter
@@ -362,9 +356,7 @@ above are reproducible from the project itself.
 
 The project adapts the group's existing Python game through successive stages.
 Its backstory, dialogue, enemy behaviour, linked puzzles, and ending choices
-reflect the contributions above. The linked engine puzzles and direct movement
-input are credited to Louis; narrative, Hunter, and ending work are credited
-to Syed, with AI assistance disclosed separately.
+reflect the contributions above.
 
 Generative AI assisted with design refinement, code, debugging, dialogue,
 terminal animations, documentation, and code-explanation study materials.
@@ -373,9 +365,4 @@ checks. AI-generated output was adapted to the existing game and its terminal
 constraints. The group remains responsible for understanding and checking it.
 
 The supplied game uses Python's standard library and text-based artwork stored
-in the source files. It does not bundle external image, music, font, or sound
-assets. No third-party code or asset source was identified in the supplied
-materials for this review. If borrowed material is included in the final
-submission, record its author, source, licence, and adaptations here; the AI-use
-log does not replace those acknowledgements. No project licence file was
-provided with the uploaded source set.
+in the source files.
