@@ -1,58 +1,332 @@
 # ENGG1330-Project
-Year 1 Sem 1 ENGG1330 Project
+Subclass D, Group 4
+
 ======================================================
-PROJECT SURVIVAL: STRATEGY & MECHANICS GUIDE
+BLACKOUT: STRATEGY & MECHANICS GUIDE
 ======================================================
 
-Welcome to the dark. This game is designed to be punishing but fair. Surviving the forest and the crashed ship requires route planning, resource management, and a deep understanding of how the enemy AI tracks you.
+Welcome to the dark. Blackout is a single-player, turn-based science-fiction
+horror adventure played entirely in the terminal. Surviving the forest and the
+crashed ship requires route planning, resource management, and an understanding
+of how the two creatures track you. Repairing the ship is only part of the problem.
 
-Here is everything you need to know to survive.
+Group members: 
 
-In a macOS, Linux, or Windows terminal, press WASD to move one turn at a time.
-Press F and then a direction to fire. Menus and puzzle answers use Enter.
-If the game shows `Enter your move:`, type your command and press Enter
-(for a Big Bang, type both letters together, such as `FW`).
-Interactive UTF-8 terminals show ☺ for the player, with cyan on macOS and
-Linux terminals that support colour. Plain terminals use @. Set `NO_COLOR=1`
-for plain ASCII.
+Here is everything you need to know to survive long enough to finish.
 
 ------------------------------------------------------
-1. THE DUAL AI SYSTEM (GHOST VS. HUNTER)
+1. THE ASSIGNMENT: HOW YOU GOT HERE
 ------------------------------------------------------
-You are being hunted by two distinct entities that work together to trap you:
-*   The Hunter (H): Relentlessly chases your exact current position.
-*   The Ghost (G): Uses a pathfinding algorithm to predict your escape route and cut you off at choke points ahead of you.
-*   The Grace Period: The aliens start moving after your first 8 turns in the forest. Use this time to secure early debris coins and position yourself.
+
+You are a spacecraft systems engineer, travelling between planets to fix
+problems someone else insists they did not cause.
+
+However, an unscheduled course correction sends your ship towards an unidentified
+planet. You crash in an enormous forest. Both engines are offline, and the
+ship's thrust regulator is missing. A maintenance signal leads you outside
+to look for it. Detours and unreliable navigation leave you lost before your
+navigation system finally identifies the planet as exceptionally dangerous.
+
+It is getting dark. Your immediate objective is to survive the forest and
+return to your ship. Once aboard, solve two connected engine puzzles and
+reach the reactor.
+Or you could try your luck and go deeper into the forest. That option exists 
+for a perfectly reasonable reason.
+
+*   Distinctive Features: A direct-pursuit Hunter and an intercepting Ghost,
+    limited supplies, linked engine repairs, a secret exit, and terminal
+    cinematics.
+*   Completion: Repair both engines and resolve the reactor sequence. Its
+    final explosion ends the game; attempting repair returns you to the
+    decision after a scripted death. The secret exit in the forest provides
+    a separate, deliberately unfinished ending. None of these endings rescues
+    the player.
+*   Playtime: The design target is approximately 5–10 minutes. Reading speed,
+    puzzle retries, and repeated repair attempts affect the actual duration.
 
 ------------------------------------------------------
-2. MAP DESIGN: BREAKING LINE OF SIGHT
+2. GETTING STARTED
 ------------------------------------------------------
-You cannot simply hold 'D' and sprint to the exit. If the aliens are within 8 tiles of you, they will sprint to close the gap.
-*   Pillars and Islands: The map is deliberately filled with jagged walls and central islands. You must use these structures to break line of sight. Loop the Hunter around a wall to force it to recalculate its path.
-*   The Gaps: We designed multiple routes through the central walls so you are never forced into a single dead-end corridor. Always have a secondary escape route in mind.
+
+Use Python 3 in an interactive terminal at least 80 columns wide and 24 rows
+high. The game uses only Python's standard library. It runs offline and needs
+no package installation, graphical window, audio device, or network connection.
+
+The course environment recorded in the testing log is Docker **v03**. Use the
+course-provided container and its launch instructions. Once inside the container, 
+change to the folder containing `main.py` and run exactly:
+
+```bash
+python3 main.py
+```
+
+The same command works on macOS and Linux with Python 3 installed. On Windows,
+from the project folder, use:
+
+```powershell
+py -3 main.py
+```
+
+Keep all eleven Python modules together under their normal names:
+`main.py`, `state.py`, `map_data.py`, `alien_logic.py`, `level_forest.py`,
+`level_ship.py`, `engine_puzzles.py`, `turn_input.py`, `ui.py`, `menus.py`,
+and `cinematics.py`. Uploaded copies with names such as `menus(1).py` must be
+renamed to `menus.py` so that imports resolve.
+
+*   New Game: Play the introduction and enter the forest.
+*   Survival Manual: Read the controls and objectives.
+*   Debug Mode: Enter `forest` to skip the introduction, `ship` to skip both
+    the introduction and forest, or press Enter for the full game. The ship
+    start still requires both engine repairs; it is not a completed save.
+*   Quit and Restart: Press X during gameplay, or use Ctrl+C during narration.
+    To restart after an ending, run `python3 main.py` again in the container
+    or use the same launch command you used locally.
+
+If the terminal becomes too small, resize it to at least 80 by 24. Gameplay
+may ask you to press Enter to resume. Narration uses Enter to advance and
+Backspace to revisit earlier pages.
 
 ------------------------------------------------------
-3. THE ECONOMY: WHY YOU CAN'T RUSH
+3. CONTROLS AND TURN RULES
 ------------------------------------------------------
-Every step you take drains your Flashlight battery. If it hits 0, you die.
-*   Level Carry-Over: Your battery, Big Bangs, and Traps carry over directly from the forest into the Level 2 Ship. Save enough battery to reach and repair the upper engine, which restores the ship's lights.
-*   Debris Coins (*): Collect coins to buy extra battery, traps, or Big Bangs if you need them.
-*   The Shop ($): Placed in opposite corners of the map. It acts as a high-risk rest stop. You have to push back into the corner of the maze to buy supplies, giving the aliens a chance to corner you. Maneuvering through requires proper thought and strategy.
+
+In an interactive macOS, Linux, or Windows terminal, press WASD to move one
+turn at a time. Menus and puzzle answers use Enter. If the game shows
+`Enter your move:`, type the command and press Enter; for a Big Bang, enter
+both letters together, such as `FW`.
+
+*   W / A / S / D: Attempt to move up, left, down, or right.
+*   F, then W / A / S / D: Fire a Big Bang in that direction.
+*   T: Place a trap. Move off its tile to arm it.
+*   E: Use an adjacent terminal or shop, or a control panel on or beside you.
+*   H: Reopen the manual once it is unlocked.
+*   X: Quit the current run.
+
+A successful move, fired attack, or placed trap can advance enemy behaviour.
+Blocked movement and invalid commands do not. Reopening help with H and
+declining an exit confirmation do not advance enemy movement. Using E at the 
+forest terminal or shop consumes an action after the menu closes, even if you 
+leave the shop without buying anything. 
+Read the prices before the creatures arrive.
+Interactive UTF-8 terminals show ☺ for the player, with cyan on supported
+macOS and Linux terminals. Plain terminals use @. Set `NO_COLOR=1` to request
+plain ASCII. On macOS, Linux, or inside the course container:
+
+```bash
+NO_COLOR=1 python3 main.py
+```
 
 ------------------------------------------------------
-4. COMBAT & DEFENSE
+4. THE DUAL AI SYSTEM (GHOST VS. HUNTER)
 ------------------------------------------------------
-You have two primary defensive tools. Use them efficiently, as resources are strictly limited:
-*   Big Bangs (F + Direction): This is a finite ammo resource. It shoots a beam that stuns any alien in its path for 5 turns. Save these for when the Hunter successfully cuts off your only escape corridor.
-*   Traps (T): Traps cost 1 battery to place and arm when you step off them. Drop these in narrow 1-tile gaps behind you while being chased by the Ghost. Do not waste them in open rooms where enemies can path around them.
+
+You are being hunted by two distinct entities:
+
+*   The Hunter (H): Pursues your exact current position using a shortest
+    walkable path. It takes two steps when its path distance from you is
+    greater than 8, and one step otherwise.
+*   The Ghost (G): Scores positions along a possible route from you to the
+    ship exit and tries to intercept you. It takes two steps when its path
+    distance from you is greater than 4, and one step otherwise. At very
+    close range it targets you directly.
+*   The Grace Period: Enemies do not move during the first 8 forest enemy-turn
+    updates. The eighth produces a warning; movement begins on the ninth.
+    Invalid keys and blocked attempts do not use up this grace period.
+*   Aboard the Ship: There is no new grace period once enemies are active.
+    They update after qualifying main-deck actions. They do not move inside
+    engine rooms or the reactor, or on the action that changes rooms.
+
+Walls change the paths the creatures can take. They do not hide your position:
+there is no line-of-sight or stealth-detection system. Use the maze to force
+longer routes and create space for a trap or flash attack.
 
 ------------------------------------------------------
-5. THE FINAL PHASE: THE SHIP
+5. THE MAP AND THE ECONOMY
 ------------------------------------------------------
-Once you reach the exit (>), you enter the crashed ship.
-*   Enter the upper engine room [1], then the lower engine room [2]. Stand next to or on the control panel (C) and press E.
-*   Your flashlight will continue to drain until one of the engines is online. Move with purpose.
-*   Once the engine fires, the emergency lights come on (stopping battery drain), and once both the engines are on the Ghost and Hunter board the ship. You must navigate the tight corridors, dodge the aliens, and reach the Reactor [R] to initiate the self-destruct sequence.
+
+The forest is one playable maze. Its floor dots are hidden for a cleaner
+view; the ship and its rooms display dots as walkable floor.
+
+*   # Wall: Blocks movement and flash attacks. Space padding outside the
+    ship is also blocked.
+*   ? Help Terminal: Stand beside it and press E to unlock the in-game manual.
+    Opening the Survival Manual from the main menu also unlocks the in-game manual.
+*   $ Shop: Stand beside it and press E. The forest has two fixed shops,
+    near the upper-right and lower-left parts of the map.
+*   * Debris Coins: Walk over them to collect 10 coins.
+*   > Forest Ship Exit: Attempt to enter it and confirm that you want to
+    make a run towards the ship.
+*   < Forest Secret Exit: The lower-left exit offers a trip deeper into
+    the forest. In ship rooms, < instead returns you to the main deck.
+
+You start with 100 battery, 3 Big Bang charges, 3 traps, and no coins.
+Ordinary successful movement costs 1 battery until the upper engine restores
+power. Placing a forest trap also costs 1 battery. Blocked movement, forest
+exit transitions, and ship room transitions do not deduct that movement cost.
+If battery reaches zero while the flashlight is required, the run ends.
+
+*   Battery: 40 coins buys 50 battery. Only two battery purchases are allowed
+    per run. The code does not cap battery at 100 after a purchase.
+*   Traps: 20 coins buys one trap.
+*   Big Bangs: 30 coins buys two charges.
+*   Carry-Over: Battery, coins, carried traps, Big Bang charges, and the
+    battery purchase count carry into the ship. Traps already placed in the
+    forest do not follow you aboard.
+
+A shop visit completes at most one purchase. Opening a menu does not make the
+forest safe; the action can give the creatures another move when it closes.
+
+------------------------------------------------------
+6. COMBAT & DEFENSE
+------------------------------------------------------
+
+You have two defensive tools. Use them efficiently, as resources are limited.
+
+*   Big Bangs: One charge fires a straight beam up to 4 walkable tiles.
+    Obstacles stop the beam. An enemy in its path receives a stun counter
+    of 5; the counter decreases when that enemy is processed on active
+    enemy updates. Stunned creatures appear as lowercase g or h.
+*   Traps: Place one at your current position and step off to arm it.
+    An enemy entering an armed trap consumes it and receives a stun counter
+    of 3. You cannot stack traps on the same tile. Trap placement costs
+    battery in the forest, but not on the ship's main deck.
+*   Placement Protection: On the action that places a trap, enemies cannot
+    finish a movement step on your tile. They can still move elsewhere.
+*   Collision: Walking onto an unstunned creature, or allowing a creature
+    to reach you during its movement, ends the run.
+
+Traps are available only on the main deck once aboard. The engine rooms and
+reactor do not contain moving enemies. The trap-protection rule gives you a
+moment to act; it does not stop the entire forest.
+
+------------------------------------------------------
+7. THE FINAL PHASE: THE SHIP
+------------------------------------------------------
+
+Confirm the forest's > exit to enter the crashed ship with your remaining
+supplies. The ship is dark, and the engines need more than encouragement.
+
+*   Upper Engine [1]: Enter the room at the top of the deck. Stand on or
+    beside C and press E. Use the clues to put cooling, starter, and fuel
+    pump connections in order. Its repair restores the lights and stops
+    flashlight drain. Remember the starter's position.
+*   Lower Engine [2]: Enter the room at the bottom of the deck. Balance
+    three fuel valves using the starter position from the upper engine,
+    their required total, and the relationship between the first two valves.
+    You must repair the upper engine first.
+*   Puzzle Feedback: Enter three digits, with optional spaces. X closes a
+    panel. Incorrect valid settings produce progressive hints; malformed
+    input asks you to enter the correct format. Closing a panel does not
+    erase completed repairs.
+*   Both Engines Online: The Ghost and Hunter board the main deck. Return
+    through < and reach R on the left side of the ship. You can enter the
+    reactor room earlier, but its controls require both completed repairs.
+*   Reactor Choice: Stand on or beside C and press E. Attempting repair
+    plays a fatal encounter, then returns you to the same decision with
+    both engines still repaired. A second attempt earns an additional line
+    of dialogue. Choosing to do nothing lets the reactor fail and ends the
+    game in an explosion that destroys the ship, the creatures aboard,
+    and much of the surrounding forest.
+
+The two puzzles are connected by both a prerequisite and a clue: the upper
+engine's result determines part of the lower engine's answer. The reactor
+checkpoint keeps that completed work in memory. There is no disk save, and
+restarting the program starts a new run.
+
+The secret forest branch is separate from the reactor choices. It plays a
+short glitch sequence, a false death, and a development-in-progress joke,
+then displays restart instructions. There is no additional playable forest.
+
+------------------------------------------------------
+8. CODE ORGANISATION AND CHECKS
+------------------------------------------------------
+
+The modules separate the game's responsibilities:
+
+*   `main.py`: Menu selection and progression between introduction, forest,
+    and ship.
+*   `state.py`: Shared resources, positions, and grid/path helpers.
+*   `map_data.py`: Forest, main deck, two engine rooms, and reactor maps.
+*   `alien_logic.py`: Pursuit, interception, pathfinding, stun, and capture.
+*   `level_forest.py` / `level_ship.py`: Movement, actions, room changes,
+    interactions, and level outcomes.
+*   `engine_puzzles.py`: Linked puzzle clues, hints, and solution checks.
+*   `turn_input.py`: Platform-specific turn input and paste handling.
+*   `ui.py`: Map display, bounded panel input, dialogue, and resize checks.
+*   `menus.py`: Main/debug menus, shop, manual, briefing, and confirmations.
+*   `cinematics.py`: Narration pagination, timed frames, and ending animations.
+
+From the project directory, perform a syntax check with:
+
+```bash
+python3 -m py_compile main.py state.py map_data.py alien_logic.py level_forest.py level_ship.py engine_puzzles.py turn_input.py ui.py menus.py cinematics.py
+```
+
+This checks Python syntax; it does not prove that gameplay or terminal output
+is correct. Then launch `python3 main.py` in an 80 by 24 terminal and check:
+
+1. Advance and revisit narration pages. Shrink the terminal, restore its size,
+   and confirm that play resumes without losing the page.
+2. Enter the forest. Try blocked movement, an invalid command, help, the shop,
+   a flash attack, and a trap. Check resources before and after each action.
+3. Decline both exits and try an invalid confirmation. Confirm that declining
+   leaves the player in place without an extra enemy turn. Accept the secret
+   exit on a separate run and check its ending and restart instructions.
+4. Accept the ship exit and compare carried resources. Debug Mode → `ship`
+   provides a quicker separate test of the engine and reactor sections.
+5. Try the lower engine before the upper one. Check rejection, invalid puzzle
+   input, wrong settings, progressive hints, cancellation, and both repairs.
+   Verify that the upper engine stops battery drain and both engines activate
+   the creatures on the main deck.
+6. Reach the reactor, attempt repair twice, and check the checkpoint and
+   repeated-death dialogue. Choose to do nothing and check the final sequence.
+7. Repeat the final submission run in a fresh course v03 container offline.
+   Restart by launching `main.py` again, rather than running a level module.
+
+Recorded checks:
+
+*   Louis's entries in `ai_use.md` report macOS, Windows, and Linux testing,
+    an earlier integrated build replayed in the offline course v03 container,
+    and a later ship-route check after the module split. Those results apply
+    to the versions identified in that log.
+*   Assistant-run checks on the latest uploaded modules passed syntax
+    compilation, shortest-path cases, Hunter speed thresholds, forest grace,
+    debug validation, help unlocking, and invalid-then-declined confirmation.
+    Reactor checks covered two repair deaths, repeated dialogue, choosing
+    to do nothing, and retained engine state.
+*   All 8 narration pages and 36 cinematic frame calls were checked against
+    the 72-column by 18-row text area inside the 80 by 24 screen. The pagination
+    repair was also checked for text preservation, page navigation, and resize
+    messages. These focused checks used isolated copies and simulated input;
+    they were not a new full-game Windows or course Docker run.
+
+The focused assistant checks were development checks outside the submitted
+modules, not an installed test framework. The syntax command and manual steps
+above are reproducible from the project itself.
+
+------------------------------------------------------
+9. KNOWN LIMITATIONS
+------------------------------------------------------
+
+*   The latest uploaded revision has not received a new full end-to-end course
+    Docker test in this review. The exact course image tag is not present in
+    the supplied files; use the official v03 course bundle and launch guidance.
+*   The 5–10 minute playtime is a target, not a measured completion guarantee.
+*   Gameplay dialogue is wrapped and limited to the available lines, so a long
+    combination of messages may be shortened. Story text instead paginates.
+*   Opening the manual from the main menu unlocks H before a forest terminal
+    is visited. This follows the shared `open_terminal()` implementation.
+*   Ship startup assigns `alien_logic.turn = 0`, while the active enemy counter
+    is stored in `s["turn"]`. The assignment does not reset that counter.
+    Ship enemy updates still bypass the forest grace period explicitly.
+*   Some enemy warnings use interception language for the Hunter, although
+    its actual target is the player's current position.
+*   The secret ending intentionally stops at a development-in-progress message.
+    There is no save/load system or automatic restart after an ending.
+*   Terminal rendering depends on an interactive terminal with ANSI support.
+    Redirected input uses a line-based fallback, and UTF-8 player display has
+    an ASCII fallback. The latest cinematic changes were not natively retested
+    on Windows in this review.
 
 ## Member contributions
 
@@ -71,15 +345,37 @@ Once you reach the exit (>), you enter the crashed ship.
   by 24 rows.
 
 ### Syed Ahnaf Akif
-- Developed the Hunter's pursuit logic and fixed pre-existing
-  bugs during development.
-- Developed the game's backstory and wrote and implemented the in-game
-  dialogues    
-- Added clearer feedback when obstacles block movement.
-- Added the debug menu and checkpoints to access different parts of the game
-  during development.
-- Implemented the forest exit confirmations and the secret ending
-- Implemented the reactor sequence, both reactor choices, the repair-death
-  checkpoint, repeated-attempt dialogue, and explosion ending.
-- Added help-menu unlocking through interaction with the help terminal.
-  AI assistance used during development is recorded in ai_use.md.
+
+- Developed the Hunter's pursuit logic and fixed pre-existing bugs during
+  development, using AI assistance to refine existing code.
+- Developed the backstory and wrote, revised, and implemented the in-game
+  dialogue. Added clearer feedback when obstacles block movement.
+- Made initial UI changes that Louis later refined and improved.
+- Added the debug menu and level entry points used during development.
+- Implemented the forest exit confirmations and the secret ending.
+- Implemented the reactor choices, repair-death checkpoint, repeated-attempt
+  dialogue, and explosion ending with AI implementation and animation assistance.
+- Added help-menu unlocking through terminal interaction and worked with AI
+  to correct narration overflow through paragraph-aware pagination.
+
+## Sources and acknowledgements
+
+The project adapts the group's existing Python game through successive stages.
+Its backstory, dialogue, enemy behaviour, linked puzzles, and ending choices
+reflect the contributions above. The linked engine puzzles and direct movement
+input are credited to Louis; narrative, Hunter, and ending work are credited
+to Syed, with AI assistance disclosed separately.
+
+Generative AI assisted with design refinement, code, debugging, dialogue,
+terminal animations, documentation, and code-explanation study materials.
+[ai_use.md](ai_use.md) records the substantive uses, retained changes, and
+checks. AI-generated output was adapted to the existing game and its terminal
+constraints. The group remains responsible for understanding and checking it.
+
+The supplied game uses Python's standard library and text-based artwork stored
+in the source files. It does not bundle external image, music, font, or sound
+assets. No third-party code or asset source was identified in the supplied
+materials for this review. If borrowed material is included in the final
+submission, record its author, source, licence, and adaptations here; the AI-use
+log does not replace those acknowledgements. No project licence file was
+provided with the uploaded source set.
