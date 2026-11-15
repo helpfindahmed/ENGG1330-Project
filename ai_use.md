@@ -115,7 +115,7 @@ Generative AI used: Yes
 
 ## Entry
 
-- Member and date: Syed Ahnaf Akif, 15 November 2026 (An expanded retrospective
+- Member and date: Syed Ahnaf Akif, 15 November 2026 (expanded retrospective
   record of work previously disclosed on 11 November 2026).
 - Tool and model/version: OpenAI ChatGPT/Codex. Exact model versions were not recorded.
 - Purpose: Refine my existing Hunter pursuit logic and assist with debugging.
@@ -132,7 +132,7 @@ Generative AI used: Yes
 
 ## Entry
 
-- Member and date: Syed Ahnaf Akif, 15 November 2026 (A retrospective record).
+- Member and date: Syed Ahnaf Akif, 15 November 2026 (retrospective record).
 - Tool and model/version: OpenAI ChatGPT/Codex. Exact model versions were not recorded.
 - Purpose: Refine and implement my backstory, dialogue, obstacle feedback,
   help-menu unlocking, and cinematic presentation.
@@ -152,7 +152,7 @@ Generative AI used: Yes
 
 ## Entry
 
-- Member and date: Syed Ahnaf Akif, 15 November 2026 (A retrospective record).
+- Member and date: Syed Ahnaf Akif, 15 November 2026 (retrospective record).
 - Tool and model/version: OpenAI ChatGPT/Codex. Exact model versions were not recorded.
 - Purpose: Create debug entry points and preserve shop positioning during changes.
 - Substantial parts affected: `main.py`, `menus.py`, `state.py`, and
