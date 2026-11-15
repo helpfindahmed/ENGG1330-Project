@@ -352,6 +352,25 @@ above are reproducible from the project itself.
 - Added help-menu unlocking through terminal interaction and worked with AI
   to correct narration overflow through paragraph-aware pagination.
 
+### Ahmed Habib
+
+- Built the foundational movement and collision engine (`open_tile`, wall/terminal 
+  blocking, and tile state restoration) that the turn-based game runs on.
+- Designed and hand-crafted the playable ASCII maps (`map_data.py`), iteratively 
+  reshaping corridors, choke points, and looping paths so players can outmaneuver 
+  stalkers using map geometry rather than luck.
+- Created and coded the core combat and defense mechanics, including directional 
+  "Big Bang" flash beam attacks, trap placement, step-off arming, trap recovery, and placement-turn protection.
+- Led the gameplay iteration and balancing process: scrapped early unfun mechanics 
+  (pressure plates, mirror puzzles, weapon heat bars, 4-tile fog-of-war, and starting with 50 coins) 
+  and engineered the final debris coin (`*`) and two-shop (`$`) economy.
+- Playtested and mathematically balanced battery drain and strategic shop coordinates 
+  so players are forced to take calculated risks in the forest to survive up to Upper Engine 1
+- Came up with Breadth-First Search (BFS) routing architecture which was implemented by Ahnaf, 
+  and later added the 8-turn forest grace period and enemy stun timers.
+- Designed the custom `BLACKOUT` ASCII main menu (`menus.py`), and executed the full architectural 
+  refactoring from a monolithic file into the final 11-module structure
+
 ## Sources and acknowledgements
 
 The project adapts the group's existing Python game through successive stages.
