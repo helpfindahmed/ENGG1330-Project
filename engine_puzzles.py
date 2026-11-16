@@ -43,11 +43,12 @@ def panel_lines(room):
         f"The upper engine's starter was in slot {IGNITION_SLOT}.",
         f"That sets valve C to {IGNITION_SLOT}. Work out valves A and B.",
         "",
-        "A and B must each be a whole number from 1 to 5.",
-        "B is exactly 1 more than A.",
-        f"A + B + C = {FUEL_TOTAL}.",
+        "Valves A and B each take 1, 2, 3, 4, or 5 fuel units.",
+        "Valve B takes one more fuel unit than valve A (B = A + 1).",
+        f"All three valves together take {FUEL_TOTAL} fuel units (A + B + C = {FUEL_TOTAL}).",
         "",
-        f"Type A and B, then {IGNITION_SLOT} as the last digit. Press Enter.",
+        "Enter three digits in A B C order: first A, then B, then C.",
+        f"With C fixed at {IGNITION_SLOT}, your input ends in {IGNITION_SLOT}. Press Enter to submit.",
         "To close the panel, type X and press Enter.",
     )
 
