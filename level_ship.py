@@ -101,7 +101,9 @@ def reactor_decision():
     while True:
         lines = ["[WARNING] REACTOR UNSTABLE", "",
                  "Coolant control has failed. Core temperature is rising.",
-                 "", "[1] Attempt to repair the reactor", "[2] Do nothing"]
+                 "The ship cannot take off. Both creatures are aboard.",
+                 "", "[1] Attempt a manual repair",
+                 "[2] Let the reactor fail"]
         if feedback:
             lines += ["", feedback]
         choice = panel_answer(lines, "Press 1 or 2 > ", single_key=True)
@@ -114,7 +116,7 @@ def reactor_decision():
         reactor_repair_animation()
         lines = ["YOU DIED.", ""]
         if attempts >= 2:
-            lines += ["You don't learn, do you?", ""]
+            lines += ["The bypass works. The door still gives way.", ""]
         lines += ["CHECKPOINT: REACTOR CONTROL PANEL",
                   "Both engines remain repaired."]
         panel_answer(lines, "Press Enter to return to the decision > ", 0)
@@ -368,10 +370,8 @@ def run_ship_level():
 
         if level_2_clear:
             explosion_animation()
-            panel_answer(["THE END.", "", "You died in the reactor explosion.",
-                          "The Ghost and Hunter were destroyed aboard the ship.",
-                          "Much of the surrounding forest is gone.", "",
-                          "To restart, run this Python file again."],
+            panel_answer(["THE END.", "", "The creatures did not escape.",
+                          "To restart, run python3 main.py again."],
                          "Press Enter to exit > ", 0)
             break
 

@@ -217,10 +217,10 @@ supplies. The ship is dark, and the engines need more than encouragement.
     reactor room earlier, but its controls require both completed repairs.
 *   Reactor Choice: Stand on or beside C and press E. Attempting repair
     plays a fatal encounter, then returns you to the same decision with
-    both engines still repaired. A second attempt earns an additional line
-    of dialogue. Choosing to do nothing lets the reactor fail and ends the
-    game in an explosion that destroys the ship, the creatures aboard,
-    and much of the surrounding forest.
+    both engines still repaired. Letting the reactor fail ends the game in an
+    explosion that destroys the ship, the creatures aboard, and much of the
+    surrounding forest. Read the ending pages at your own pace using Enter
+    and Backspace.
 
 The two puzzles are connected by both a prerequisite and a clue: the upper
 engine's result determines part of the lower engine's answer. The reactor
@@ -273,7 +273,7 @@ is correct. Then launch `python3 main.py` in an 80 by 24 terminal and check:
    Verify that the upper engine stops battery drain and both engines activate
    the creatures on the main deck.
 6. Reach the reactor, attempt repair twice, and check the checkpoint and
-   repeated-death dialogue. Choose to do nothing and check the final sequence.
+   repeated-death dialogue. Choose to let the reactor fail and check the final sequence.
 7. Repeat the final submission run in a fresh course v03 container offline.
    Restart by launching `main.py` again, rather than running a level module.
 

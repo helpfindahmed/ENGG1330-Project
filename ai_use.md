@@ -482,3 +482,9 @@ Generative AI used: Yes
   one recharge and no combat actions before boarding at 64% battery.
   Verified the crash frame bounds, Backspace, both engine repairs, wrong
   inputs, restart, and 231 gameplay screens at 80 by 24 in each run.
+
+- Follow-up on 16 November: Revised the reactor choice and ending pages in
+  `cinematics.py` and `level_ship.py` after playtest feedback on pacing and
+  story clarity. Retained both outcomes and the repair checkpoint. Tested
+  starting a new game and choosing 2 directly, and choosing 1 then 2, in
+  separate 80 by 24 macOS runs. Checked Backspace and the five ending pages.
