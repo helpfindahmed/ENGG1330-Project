@@ -1,4 +1,4 @@
-**# AI Use
+# AI Use
 
 Generative AI used: Yes
 
@@ -6,112 +6,55 @@ Generative AI used: Yes
 
 - Member and date: Hongkang Liu, 11 November 2026.
 - Tool and model/version: OpenAI Codex. Exact model version was not recorded.
-- Purpose: Design two linked engine repairs and integrate them into the existing
-  ship level.
-- Substantial parts affected: `engine_puzzles.py` and the engine interaction
-  and instructions in `main.py`.
-- What was kept, changed, or rejected: Added relay ordering for Engine 1 and
-  used its ignition slot as a fuel valve clue for Engine 2. Kept the team's
-  ship maps, flashlight carryover, enemy activation and reactor ending.
-  After player feedback, labelled the engine rooms by deck position and
-  asked players to enter the three part numbers in order. Added retries
-  inside both panels and explicit repair confirmation before returning.
-  Added progressive hints that become more specific after wrong answers.
-  Added persistent repair instructions on the map and let players use the
-  console while standing on it or beside it.
-  Added separate upper and lower engine status labels after player feedback.
-- How results were checked: Enumerated relay orders and valve settings to
-  verify each puzzle has one solution. Scripted the ship-level controls to
-  test incorrect input, panel cancellation, the engine prerequisite, power
-  restoration, and reaching the reactor ending. Tested the map hints and both
-  console positions. Checked both panel sizes
-  against 80 by 24. See the later entry for the course container replay.
+- Purpose: Design and integrate the two linked engine puzzles.
+- Substantial parts affected: `engine_puzzles.py` and the original ship level.
+- What was kept, changed, or rejected: Kept the linked relay and fuel puzzles, repair feedback and progressive hints.
+- How results were checked: Checked unique solutions, panel size, retries and ship progression.
 
 ## Entry
 
 - Member and date: Hongkang Liu, 11 November 2026.
 - Tool and model/version: OpenAI Codex. Exact model version was not recorded.
-- Purpose: Prototype direct WASD input and integrate it after testing.
-- Substantial parts affected: `direct_wasd_demo.py`, `turn_input.py` and the
-  movement input in `main.py`.
-- What was kept and how it was checked: Movement and flash attacks advance
-  one command at a time. Text prompts still submit with Enter. Tested the
-  separate demo in a macOS terminal session before integrating it. Replayed
-  forest controls and both ship repairs through the new input and checked
-  terminal restoration on exit and interruption.
+- Purpose: Prototype single-key movement and flashlight controls.
+- Substantial parts affected: `direct_wasd_demo.py`, `turn_input.py` and the original movement loop.
+- What was kept, changed, or rejected: Kept one turn per action and Enter for typed answers.
+- How results were checked: Tested movement, both engine repairs and terminal recovery on macOS.
 
 ## Entry
 
 - Member and date: Hongkang Liu, 11 November 2026.
 - Tool and model/version: OpenAI Codex. Exact model version was not recorded.
-- Purpose: Integrate progressive hints with the team's new ship screens and
-  add Windows single-key movement.
-- Substantial parts affected: Engine panel interaction in `main.py`
-  and console input in `turn_input.py`.
-- What was kept and how it was checked: Kept the team's updated map, fixed-size
-  panel renderer, and power restoration after the upper engine. Replayed both
-  repairs in an 80 by 24 macOS terminal and checked hint progression, retry and
-  reopen behavior, and flashlight drain before and after the first repair.
-  Checked Windows command handling with simulated console input. The later entry records the
-  native Windows console test on the updated build.
+- Purpose: Integrate progressive hints and support Windows keyboard input.
+- Substantial parts affected: Engine panels and `turn_input.py`.
+- What was kept, changed, or rejected: Kept the ship layout and power-restoration rules during integration.
+- How results were checked: Replayed both repairs on macOS and simulated Windows console input.
 
 ## Entry
 
 - Member and date: Hongkang Liu, 11 November 2026.
 - Tool and model/version: OpenAI Codex. Exact model version was not recorded.
-- Purpose: Fix issues found in the pre-push review.
-- Substantial parts affected: The ship display in `main.py`, the
-  upper engine hint in `engine_puzzles.py`, and Escape handling in
-  `turn_input.py`.
-- How results were checked: Replayed both engine repairs, boarding enemies
-  and the reactor ending on macOS and in the offline course Docker image.
-  Checked all 115 ship map frames against 80 by 24. Verified on macOS that
-  a move typed immediately after Escape still advances one turn.
+- Purpose: Fix display and input issues found in review.
+- Substantial parts affected: Ship display, `engine_puzzles.py` and `turn_input.py`.
+- What was kept, changed, or rejected: Adjusted the ship display, an engine hint and Escape handling.
+- How results were checked: Replayed the ship route on macOS and in course Docker at 80 by 24.
 
 ## Entry
 
 - Member and date: Hongkang Liu, 12 November 2026.
 - Tool and model/version: OpenAI Codex. Exact model version was not recorded.
-- Purpose: Improve first-time player guidance and feedback on invalid input.
-- Substantial parts affected: Briefings, objectives, map rendering, and panel
-  feedback in `main.py` and turn input in `turn_input.py`.
-- How results were checked: Played from the opening story to the reactor
-  ending on macOS with colour enabled and disabled. All 191 forest and ship
-  map frames in each run fit 80 by 24. Compared all five maps against the
-  team version to verify the geometry. Tested blocked moves, invalid keys
-  and aiming, oversized menu and puzzle input, bracketed paste at movement
-  prompts, and shrinking and restoring the terminal mid-game.
-  Verified the cyan player icon in VS Code's terminal renderer at 80 by 24
-  and checked the ASCII fallback under simulated Windows, non-UTF-8, and
-  redirected output.
-  Repeated the terminal checks on Ubuntu and Windows GitHub-hosted runners
-  using the same game files. Both passed at 80 by 24, including direct WASD,
-  player-marker alignment, resizing, invalid actions, and both engine puzzles.
-  Paste rejection was exercised on Linux.
-  Enabled the one-cell smiley on Windows UTF-8 consoles and confirmed that
-  both the smiley and the explicit ASCII fallback stay aligned on Windows
-  and Ubuntu at 80 by 24.
-  Rebuilt the course Docker v03 image from the provided bundle and replayed
-  the pre-refactor build from the opening through the reactor ending in a fresh
-  container with networking disabled. All 191 captured forest and ship map
-  frames fit 80 by 24. The run covered invalid input, terminal resizing,
-  engine retries, and battery behavior after the upper engine repair.
-  Clarified the opening's playable objective and corrected the README's
-  grace-period and battery guidance. Rechecked the full revised build in
-  the same offline course v03 container at 80 by 24.
-
+- Purpose: Improve player guidance, map readability and invalid-input feedback.
+- Substantial parts affected: Briefings, objectives, map rendering, README and `turn_input.py`.
+- What was kept, changed, or rejected: Added clearer objectives and a player marker with an ASCII fallback.
+- How results were checked: Tested controls on Windows, Ubuntu and macOS, and replayed the earlier build in offline course Docker.
 
 ## Entry
 
 - Member and date: Hongkang Liu, 14 November 2026.
 - Tool and model/version: OpenAI Codex. Exact model version was not recorded.
-- Purpose: Check that my engine puzzles and player guidance carried over into
-  Blackout, and document my contributions using the repository history.
-- Substantial parts affected: My contribution entry in `README.md` and this log.
-- How results were checked: On macOS, started Blackout at the ship using the
-  debug menu, repaired both engines, tested invalid input and progressive
-  hints, and reached the reactor ending. All 136 captured gameplay screens
-  in this run fit 80 columns by 24 rows.
+- Purpose: Review Blackout after the module split and document my contributions.
+- Substantial parts affected: `README.md` and `ai_use.md`.
+- What was kept, changed, or rejected: Updated my contribution record and kept the existing game rules.
+- How results were checked: Replayed both engine repairs and the reactor ending on macOS at 80 by 24.
 
 ## Entry
 
@@ -468,49 +411,7 @@ Generative AI used: Yes
 
 - Member and date: Hongkang Liu, 16 November 2026.
 - Tool and model/version: OpenAI Codex. Exact model version was not recorded.
-- Purpose: Improve the opening and forest after a first-time playtest exposed
-  unclear crash art, input rules, recharge guidance, and engine clues.
-- Substantial parts affected: `cinematics.py`, `menus.py`, `ui.py`,
-  `level_forest.py`, `alien_logic.py`, `level_ship.py`, `engine_puzzles.py`,
-  and the README.
-- What was kept, changed, or rejected: Used a consistent ship and treeline for
-  the crash panels, made the opening manually paged, and used direct keys for
-  menu choices. Added a longer forest grace period, slower forest enemies,
-  and clearer battery and map guidance. Kept the linked puzzle solutions.
-- How results were checked: Replayed New Game to the reactor ending on macOS
-  and offline in the course Docker v03 image. The updated forest route used
-  one recharge and no combat actions before boarding at 64% battery.
-  Verified the crash frame bounds, Backspace, both engine repairs, wrong
-  inputs, restart, and 231 gameplay screens at 80 by 24 in each run.
-
-- Follow-up on 16 November: Revised the reactor choice and ending pages in
-  `cinematics.py` and `level_ship.py` after playtest feedback on pacing and
-  story clarity. Retained both outcomes and the repair checkpoint. Tested
-  starting a new game and choosing 2 directly, and choosing 1 then 2, in
-  separate 80 by 24 macOS runs. Checked Backspace and the five ending pages.
-
-- Further follow-up on 16 November: Replaced the forest ending placeholder
-  with two readable story pages and matched the legend symbol colours to
-  the map. Playtested declining and accepting the forest exit, Backspace,
-  and quitting at the ending on macOS. Checked legend colour pairing,
-  80-column width, and plain rendering.
-
-- Input audit follow-up on 16 November: Reused the movement key reader in
-  single-key menus to reject terminal escape sequences and bracketed paste.
-  Reproduced accidental menu selections before the fix. Rechecked the title
-  and shop menus, repeated shooting, invalid movement input, and a full
-  macOS run including both reactor choices.
-
-- Death screen follow-up on 16 November: Added a shared death screen with
-  restart instructions. Verified by running out of battery in both levels
-  and replaying the reactor repair checkpoint and explosion ending on macOS.
-
-- Opening follow-up on 16 November: Condensed the introduction to four pages,
-  including the existing three ASCII crash panels. Kept the engineer setup
-  and the goal of returning to the wreck. Checked page dimensions, Backspace,
-  and a full macOS playthrough from New Game to the reactor ending.
-
-- Completion-screen follow-up on 16 November: Clarified the reactor-room
-  goal and added a distinct MISSION COMPLETE screen while retaining the
-  sacrifice ending. Checked both reactor choices and replayed the full
-  macOS route after the change.
+- Purpose: Refine the game after playtesting and make progression easier to follow.
+- Substantial parts affected: `cinematics.py`, `menus.py`, `ui.py`, `turn_input.py`, `level_forest.py`, `alien_logic.py`, `level_ship.py`, `engine_puzzles.py` and README.
+- What was kept, changed, or rejected: Shortened the opening, improved controls and forest balance, clarified the fuel puzzle, and revised the endings, death screens and mission-complete screen.
+- How results were checked: Tested the full route, both reactor choices, the forest ending and invalid input on macOS. Ran the final gameplay ZIP offline in course Docker at 80 by 24.
