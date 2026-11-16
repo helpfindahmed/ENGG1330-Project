@@ -4,7 +4,7 @@ import textwrap
 
 # Pull in the terminal sizing tools you moved to cinematics
 from cinematics import intro_terminal_size, intro_draw, _intro_key
-from turn_input import posix_key_reader, read_turn
+from turn_input import TERMINAL_TOO_SMALL, posix_key_reader, read_turn
 
 MAP_COLORS = {
     "@": "96", "☺": "96",
@@ -131,8 +131,8 @@ def show_death(reason):
 def read_map_turn(redraw):
     while True:
         if terminal_ready():
-            move = read_turn()
-            if move == "X" or terminal_ready():
+            move = read_turn(can_play=terminal_ready)
+            if move != TERMINAL_TOO_SMALL:
                 return move
         panel_answer(["Terminal resized. Press Enter to resume."], "Continue > ", 0)
         redraw()

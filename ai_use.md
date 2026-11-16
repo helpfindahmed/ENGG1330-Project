@@ -418,3 +418,7 @@ Generative AI used: Yes
 
 - Final balance check: Restored the eight-turn forest grace period and verified
   a recharge route through both repairs and MISSION COMPLETE in course Docker.
+
+- Resize follow-up: Made movement and aiming pause immediately below 80 by 24.
+  Checked idle resize and recovery without consuming a turn on macOS, and
+  simulated the Windows input path.
