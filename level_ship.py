@@ -103,7 +103,7 @@ def reactor_decision():
                  "Coolant control has failed. Core temperature is rising.",
                  "The ship cannot take off. Both creatures are aboard.",
                  "", "[1] Attempt a manual repair",
-                 "[2] Let the reactor fail"]
+                 "[2] Do nothing"]
         if feedback:
             lines += ["", feedback]
         choice = panel_answer(lines, "Press 1 or 2 > ", single_key=True)
