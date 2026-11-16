@@ -354,7 +354,7 @@ above are reproducible from the project itself.
 
 ### Ahmed Habib
 
-- Built the foundational movement and collision engine (`open_tile`, wall/terminal 
+- Built the foundational movement and collision engine ([README.md](README.md)`open_tile`, wall/terminal 
   blocking, and tile state restoration) that the turn-based game runs on.
 - Designed and hand-crafted the playable ASCII maps (`map_data.py`), iteratively 
   reshaping corridors, choke points, and looping paths so players can outmaneuver 
@@ -370,6 +370,20 @@ above are reproducible from the project itself.
   and later added the 8-turn forest grace period and enemy stun timers.
 - Designed the custom `BLACKOUT` ASCII main menu (`menus.py`), and executed the full architectural 
   refactoring from a monolithic file into the final 11-module structure
+
+### Dai Tianqi
+- Developed and integrated a complete in-game shop system in menu.py. Implemented the purchase process,
+  coin management, and the application of purchased item effects during gameplay. Connected these components
+  into a cohesive system, allowing players to spend their available coins on useful resources and benefit
+  from their purchases. 
+- Designed and implemented an informative status bar displaying remaining Flash uses, trap counts, and
+  coin balance, helping players track resources and make strategic decisions.
+- Established the foundation for the ship-based second level, developing the initial map and a three-room
+  layout comprising engine rooms and a reactor room.
+- Created the game’s ending animation and conducted compatibility testing, checking that the interface
+  and animations fit within an 80 × 24 terminal display and testing execution in Docker.
+- Produced the complete promotional trailer, combining gameplay footage, audio, and feature demonstrations
+  to showcase the game’s core mechanics and atmosphere.
 
 ## Sources and acknowledgements
 

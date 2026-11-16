@@ -1,4 +1,4 @@
 FROM python:3.11-slim
 WORKDIR /app
 COPY . .
-CMD ["python3", "movement_logic.py"]
+CMD ["python3", "main.py"]
