@@ -40,15 +40,11 @@ def panel_lines(room):
     return (
         "LOWER ENGINE | BALANCE THE FUEL",
         "",
-        f"The upper engine's starter was in slot {IGNITION_SLOT}.",
-        f"That sets valve C to {IGNITION_SLOT}. Work out valves A and B.",
+        "A is one less than B.",
+        f"C is {IGNITION_SLOT} (from the upper engine).",
+        f"A + B + C = {FUEL_TOTAL}.",
         "",
-        "Valves A and B each take 1, 2, 3, 4, or 5 fuel units.",
-        "Valve B takes one more fuel unit than valve A (B = A + 1).",
-        f"All three valves together take {FUEL_TOTAL} fuel units (A + B + C = {FUEL_TOTAL}).",
-        "",
-        "Enter three digits in A B C order: first A, then B, then C.",
-        f"With C fixed at {IGNITION_SLOT}, your input ends in {IGNITION_SLOT}. Press Enter to submit.",
+        "Enter three digits in A B C order, then press Enter.",
         "To close the panel, type X and press Enter.",
     )
 
