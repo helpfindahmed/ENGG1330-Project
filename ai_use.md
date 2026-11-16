@@ -494,3 +494,9 @@ Generative AI used: Yes
   the map. Playtested declining and accepting the forest exit, Backspace,
   and quitting at the ending on macOS. Checked legend colour pairing,
   80-column width, and plain rendering.
+
+- Input audit follow-up on 16 November: Reused the movement key reader in
+  single-key menus to reject terminal escape sequences and bracketed paste.
+  Reproduced accidental menu selections before the fix. Rechecked the title
+  and shop menus, repeated shooting, invalid movement input, and a full
+  macOS run including both reactor choices.

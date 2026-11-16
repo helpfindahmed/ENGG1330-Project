@@ -42,21 +42,9 @@ def _read_windows_key():
     return key.upper()
 
 
-def read_turn(prompt="Move [WASD | F + direction | E | T | H | X] > "):
-    if not sys.stdin.isatty() or os.name not in ("nt", "posix"):
-        try:
-            return input("Enter your move: ").strip().upper()
-        except EOFError:
-            return "X"
-    if os.name == "nt":
-        return _read_command(_read_windows_key, prompt)
-
+def posix_key_reader(fd, wait=None):
+    """Return a key reader that filters terminal escapes and bracketed paste."""
     import select
-    import termios
-    import tty
-
-    fd = sys.stdin.fileno()
-    original = termios.tcgetattr(fd)
 
     pending_key = b""
 
@@ -74,6 +62,8 @@ def read_turn(prompt="Move [WASD | F + direction | E | T | H | X] > "):
 
     def read_key():
         nonlocal pending_key
+        if not pending_key and wait is not None and not select.select([fd], [], [], wait)[0]:
+            return ""
         key = pending_key or os.read(fd, 1)
         pending_key = b""
         if key != b"\x1b":
@@ -100,10 +90,28 @@ def read_turn(prompt="Move [WASD | F + direction | E | T | H | X] > "):
                 pending_key = prefix
         return "\x1b"
 
+    return read_key
+
+
+def read_turn(prompt="Move [WASD | F + direction | E | T | H | X] > "):
+    if not sys.stdin.isatty() or os.name not in ("nt", "posix"):
+        try:
+            return input("Enter your move: ").strip().upper()
+        except EOFError:
+            return "X"
+    if os.name == "nt":
+        return _read_command(_read_windows_key, prompt)
+
+    import termios
+    import tty
+
+    fd = sys.stdin.fileno()
+    original = termios.tcgetattr(fd)
+
     try:
         tty.setcbreak(fd, termios.TCSANOW)
         print("\033[?2004h", end="", flush=True)
-        return _read_command(read_key, prompt)
+        return _read_command(posix_key_reader(fd), prompt)
     finally:
         termios.tcsetattr(fd, termios.TCSANOW, original)
         print("\033[?2004l", end="", flush=True)

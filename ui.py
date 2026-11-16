@@ -4,7 +4,7 @@ import textwrap
 
 # Pull in the terminal sizing tools you moved to cinematics
 from cinematics import intro_terminal_size, intro_draw, _intro_key
-from turn_input import read_turn
+from turn_input import posix_key_reader, read_turn
 
 MAP_COLORS = {
     "@": "96", "☺": "96",
@@ -68,6 +68,7 @@ def terminal_ready():
 def panel_answer(lines, prompt="Setting > ", max_length=16, *, single_key=False):
     """Read a bounded text answer or an immediate menu key."""
     saved = None
+    menu_key = None
     answer = ""
     overflow = 0
     previous = None
@@ -80,13 +81,16 @@ def panel_answer(lines, prompt="Setting > ", max_length=16, *, single_key=False)
             settings[6][termios.VMIN] = 1
             settings[6][termios.VTIME] = 0
             termios.tcsetattr(sys.stdin.fileno(), termios.TCSANOW, settings)
+            if single_key:
+                menu_key = posix_key_reader(sys.stdin.fileno(), wait=0.02)
+                print("\033[?2004h", end="", flush=True)
         while True:
             size = intro_terminal_size()
             ready = size[0] >= 80 and size[1] >= 24
             if (size, answer) != previous:
                 intro_draw(lines, prompt + answer, size)
                 previous = (size, answer)
-            key = _intro_key(sys.stdin.isatty(), ready, size)
+            key = menu_key() if menu_key else _intro_key(sys.stdin.isatty(), ready, size)
             if key in ("\x03", "\x04"):
                 raise KeyboardInterrupt
             if not ready or intro_terminal_size() != size:
@@ -111,6 +115,8 @@ def panel_answer(lines, prompt="Setting > ", max_length=16, *, single_key=False)
     except (EOFError, KeyboardInterrupt):
         raise SystemExit(0)
     finally:
+        if menu_key:
+            print("\033[?2004l", end="", flush=True)
         if saved is not None:
             termios.tcsetattr(sys.stdin.fileno(), termios.TCSANOW, saved)
 
