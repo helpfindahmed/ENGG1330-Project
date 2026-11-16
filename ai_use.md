@@ -427,3 +427,17 @@ Generative AI used: Yes
   and reactor ending, and to restore the earlier forest HUD for visual
   consistency with the trailer. Compared the HUD to the trailer footage and
   tested progression through both engine puzzles and the ending on macOS.
+
+## Entry
+
+- Member and date: Hongkang Liu, 16 November 2026.
+- Tool and model/version: OpenAI Codex. Exact model version was not recorded.
+- Purpose: Edit the submitted technical demo around a fresh gameplay recording.
+- Substantial parts affected: Gameplay cuts, English captions, opening title,
+  and the transition into Ahmed's technical explanation in `Demo.mp4`.
+- What was kept, changed, or rejected: Played and recorded the game myself.
+  Used Codex to shorten travel footage and add captions and a title card.
+  Kept Ahmed's technical footage at its original timing and reused the audio.
+- How results were checked: Reviewed the captions, puzzle feedback, and mission
+  ending against the gameplay. Verified that the cut to the code segment and
+  the original audio packet timings matched the original demo.

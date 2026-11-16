@@ -316,6 +316,10 @@ Recorded checks on the final game code:
   the earlier integrated build in the offline course Docker container.
   Rechecked the ship route on Blackout after the module split at 80 columns
   by 24 rows.
+- Recorded the final gameplay from New Game through MISSION COMPLETE,
+  edited the gameplay and captions, and combined them with Ahmed's
+  technical explanation. Prepared the submission ZIP and checked it in
+  the course container.
 
 ### Syed Ahnaf Akif
 
@@ -333,7 +337,7 @@ Recorded checks on the final game code:
 
 ### Ahmed Habib
 
-- Built the foundational movement and collision engine ([README.md](README.md)`open_tile`, wall/terminal 
+- Built the foundational movement and collision engine (`open_tile`, wall/terminal
   blocking, and tile state restoration) that the turn-based game runs on.
 - Designed and hand-crafted the playable ASCII maps (`map_data.py`), iteratively 
   reshaping corridors, choke points, and looping paths so players can outmaneuver 
@@ -349,11 +353,12 @@ Recorded checks on the final game code:
   and later added the 8-turn forest grace period and enemy stun timers.
 - Designed the custom `BLACKOUT` ASCII main menu (`menus.py`), and executed the full architectural 
   refactoring from a monolithic file into the final 11-module structure
-- Produced the complete demo including gameplay footage, explanation, explaining the code and 
-  finally the AI reflection (which was compiled by everyone)
+- Produced the original gameplay and technical demo, including the code
+  explanation and audio used in the final edit. Presented the group's AI
+  development reflection.
 
 ### Dai Tianqi
-- Developed and integrated a complete in-game shop system in menu.py. Implemented the purchase process,
+- Developed and integrated a complete in-game shop system in `menus.py`. Implemented the purchase process,
   coin management, and the application of purchased item effects during gameplay. Connected these components
   into a cohesive system, allowing players to spend their available coins on useful resources and benefit
   from their purchases. 
@@ -373,10 +378,14 @@ Its backstory, dialogue, enemy behaviour, linked puzzles, and ending choices
 reflect the contributions above.
 
 Generative AI assisted with design refinement, code, debugging, dialogue,
-terminal animations, documentation, and code-explanation study materials.
+terminal animations, documentation, and video production.
 [ai_use.md](ai_use.md) records the substantive uses, retained changes, and
 checks. AI-generated output was adapted to the existing game and its terminal
 constraints. The group remains responsible for understanding and checking it.
 
 The supplied game uses Python's standard library and text-based artwork stored
 in the source files.
+
+The final technical demo combines Louis's current-build gameplay recording
+with Ahmed's original technical footage, narration, and background music.
+Eric produced the promotional trailer.
