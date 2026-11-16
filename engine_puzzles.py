@@ -15,7 +15,7 @@ PANEL_HINTS = {
         "Start with C, which is fixed by the upper engine.",
         "Subtract C from the total to find how much A and B share.",
         f"A and B add up to {FUEL_TOTAL - IGNITION_SLOT}. B is one higher than A.",
-        "Split that sum into consecutive numbers. Put the smaller one in A.",
+        "Find two consecutive numbers. Put the smaller one in A.",
     ),
 }
 
@@ -40,12 +40,15 @@ def panel_lines(room):
     return (
         "LOWER ENGINE | BALANCE THE FUEL",
         "",
-        "Set fuel valves A, B and C to whole numbers from 1 to 5.",
-        "B needs one more unit than A.",
-        f"C must match the upper engine's starter position ({IGNITION_SLOT}).",
-        f"The three valves must total {FUEL_TOTAL} units.",
+        f"The upper engine's starter was in slot {IGNITION_SLOT}.",
+        f"That sets valve C to {IGNITION_SLOT}. Work out valves A and B.",
         "",
-        "Enter the three numbers in A B C order. X closes the panel.",
+        "A and B must each be a whole number from 1 to 5.",
+        "B is exactly 1 more than A.",
+        f"A + B + C = {FUEL_TOTAL}.",
+        "",
+        f"Type A and B, then {IGNITION_SLOT} as the last digit. Press Enter.",
+        "To close the panel, type X and press Enter.",
     )
 
 
