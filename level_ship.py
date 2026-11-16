@@ -104,7 +104,7 @@ def reactor_decision():
                  "", "[1] Attempt to repair the reactor", "[2] Do nothing"]
         if feedback:
             lines += ["", feedback]
-        choice = panel_answer(lines, "Choose 1 or 2, then press Enter > ")
+        choice = panel_answer(lines, "Press 1 or 2 > ", single_key=True)
         if choice == "2":
             return
         if choice != "1":

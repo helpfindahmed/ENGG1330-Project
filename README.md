@@ -83,7 +83,7 @@ renamed to `menus.py` so that imports resolve.
     or use the same launch command you used locally.
 
 If the terminal becomes too small, resize it to at least 80 by 24. Gameplay
-may ask you to press Enter to resume. Narration uses Enter to advance and
+may ask you to press Enter to resume. Narration and the three crash panels use Enter to advance and
 Backspace to revisit earlier pages.
 
 ------------------------------------------------------
@@ -91,7 +91,8 @@ Backspace to revisit earlier pages.
 ------------------------------------------------------
 
 In an interactive macOS, Linux, or Windows terminal, press WASD to move one
-turn at a time. Menus and puzzle answers use Enter. If the game shows
+turn at a time. Numbered menus respond to a single key. Use Enter to turn story pages
+or submit typed answers. If the game shows
 `Enter your move:`, type the command and press Enter; for a Big Bang, enter
 both letters together, such as `FW`.
 

@@ -28,7 +28,7 @@ def main_menu():
         if feedback:
             display_lines.extend(["", feedback])
 
-        choice = panel_answer(display_lines, "Select an option > ").upper()
+        choice = panel_answer(display_lines, "Press 1, 2, 3, or X > ", single_key=True).upper()
         if choice in ("1", "2", "3", "X"):
             return choice
         feedback = "Invalid choice. Enter 1, 2, 3, or X."
@@ -44,11 +44,11 @@ def enter_shop():
             "[3] 2 Big Bangs (30 coins)",
             "",
             f"Coins: {s['coins']}",
-            "Enter 1, 2, or 3 to buy, or X to leave.",
+            "Press 1, 2, or 3 to buy, or X to leave.",
         ]
         if feedback:
             lines.extend(("", feedback))
-        choice = panel_answer(lines, "Shop choice > ").upper()
+        choice = panel_answer(lines, "Press 1, 2, 3, or X > ", single_key=True).upper()
         if choice == "X":
             return "You leave the shop."
         if choice in ("1", "2", "3"):
@@ -79,6 +79,8 @@ def open_terminal():
     s["help_unlocked"] = True
     panel_answer([
         "SURVIVAL MANUAL (PAGE 1/2)",
+        "Move and choose menu options with a single key.",
+        "Use Enter to turn pages or submit a typed answer.",
         "",
         "WASD       Move one tile per keypress (costs battery)",
         "F + WASD   Aim a flash attack to stun enemies",
@@ -111,7 +113,7 @@ def show_forest_briefing():
         "Buy battery before boarding your ship at > on the right.",
         "",
         "Collect four * tiles (10 coins each). Stand beside $ and press E.",
-        "Choose 1 + Enter to spend 40 coins on +50 battery.",
+        "Press 1 to spend 40 coins on +50 battery.",
         "Your battery carries aboard and drains until the first repair.",
         "",
         "WASD moves one tile. # is a wall; blank spaces are floor.",
@@ -144,7 +146,7 @@ def confirm_forest_exit(question):
         lines = [question, "", "[1] Yes", "[2] No"]
         if feedback:
             lines += ["", feedback]
-        choice = panel_answer(lines, "Choose 1 or 2, then press Enter > ")
+        choice = panel_answer(lines, "Press 1 or 2 > ", single_key=True)
         if choice in ("1", "2"):
             return choice == "1"
         feedback = "Invalid choice. Enter 1 or 2."

@@ -98,9 +98,8 @@ def intro_steps(text):
         pages.append(lines)
     return pages or [[]]
 
-def intro_frame(text, start=0):
-    steps = intro_steps(text)
-    index = len(steps) - 1 if start < 0 else min(start, len(steps) - 1)
+def show_intro_pages(pages):
+    index = 0
     prompt = "Enter to continue | Backspace to go back | Ctrl+C to quit"
     interactive = sys.stdin.isatty() or (
         os.name == "nt" and sys.stdout.isatty()
@@ -110,7 +109,7 @@ def intro_frame(text, start=0):
         size = intro_terminal_size()
         ready = size[0] >= 80 and size[1] >= 24
         if (size, index) != previous:
-            intro_draw(steps[index], prompt, size)
+            intro_draw(pages[index], prompt, size)
             previous = (size, index)
         key = _intro_key(interactive, ready, size)
         if key in ("\x03", "\x04"):
@@ -118,12 +117,10 @@ def intro_frame(text, start=0):
         if not ready or intro_terminal_size() != size:
             continue
         if key in ("\x08", "\x7f"):
-            if index == 0:
-                return "back"
-            index -= 1
+            index = max(0, index - 1)
         elif key in ("\n", "\r"):
-            if index == len(steps) - 1:
-                return "next"
+            if index == len(pages) - 1:
+                return
             index += 1
 
 def intro_timed_frame(lines, seconds):
@@ -332,27 +329,11 @@ def intro_story():
 
 [FLIGHT RECORDER] SIGNAL LOST'''.splitlines(),
     ]
-    index = 0
-    start = 0
-    while index < len(frames):
-        if index == 2:
-            for lines, delay in zip(crash_frames, (0.9, 0.9, 1.1)):
-                intro_timed_frame(lines, delay)
-            intro_timed_frame([], 0.45)
-        if index == 4:
-            lead, notices, _ = frames[index].split("\n\n", 2)
-            lines = textwrap.wrap(lead, width=72) + [""]
-            intro_timed_frame(lines, 1.0)
-            for notice in notices.splitlines():
-                lines.append(notice)
-                intro_timed_frame(lines, 0.4)
-        result = intro_frame(frames[index], start=start)
-        if result == "back":
-            start = -1 if index > 0 else 0
-            index = max(0, index - 1)
-        else:
-            index += 1
-            start = 0
+    pages = [page for scene in frames[:2] for page in intro_steps(scene)]
+    pages.extend(crash_frames)
+    pages.extend(page for scene in frames[2:] for page in intro_steps(scene))
+    show_intro_pages(pages)
+
 
 def explosion_animation():
     frames = [

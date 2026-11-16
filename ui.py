@@ -56,8 +56,8 @@ def terminal_ready():
     intro_draw([], "", size)
     return False
 
-def panel_answer(lines, prompt="Setting > ", max_length=16):
-    """Bound puzzle input to one screen, including invalid or pasted input."""
+def panel_answer(lines, prompt="Setting > ", max_length=16, *, single_key=False):
+    """Read a bounded text answer or an immediate menu key."""
     saved = None
     answer = ""
     overflow = 0
@@ -81,6 +81,10 @@ def panel_answer(lines, prompt="Setting > ", max_length=16):
             if key in ("\x03", "\x04"):
                 raise KeyboardInterrupt
             if not ready or intro_terminal_size() != size:
+                continue
+            if single_key:
+                if key and len(key) == 1 and " " < key <= "~":
+                    return key
                 continue
             if key in ("\n", "\r"):
                 # Reject overflow so a truncated prefix cannot be submitted.
