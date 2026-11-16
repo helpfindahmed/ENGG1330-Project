@@ -127,27 +127,6 @@ def _navigate_story_pages(pages):
                 return
             index += 1
 
-def intro_timed_frame(lines, seconds):
-    if len(lines) > 18 or any(len(line) > 72 for line in lines):
-        raise ValueError("Introduction animation exceeds its text area")
-    remaining = seconds * 2.2
-    previous_size = None
-    while remaining > 0:
-        size = intro_terminal_size()
-        ready = size[0] >= 80 and size[1] >= 24
-        if size != previous_size:
-            intro_draw(lines, "", size)
-            previous_size = size
-        started = time.monotonic()
-        if sys.stdin.isatty():
-            key = _intro_key(True, ready, size)
-            if key in ("\x03", "\x04"):
-                raise KeyboardInterrupt
-        else:
-            time.sleep(0.02)
-        if ready and intro_terminal_size() == size:
-            remaining -= time.monotonic() - started
-
 def intro_story():
     """narrative pages with Enter and Backspace navigation."""
     frames = [
@@ -378,30 +357,23 @@ You had found a way to save the ship. You ran out of time.""".splitlines(),
 
 
 def secret_ending():
-    """A brief visual interruption, then a clean end with restart guidance."""
-    saved = None
-    try:
-        if sys.stdin.isatty() and os.name == "posix":
-            import termios
-            saved = termios.tcgetattr(sys.stdin.fileno())
-            settings = termios.tcgetattr(sys.stdin.fileno())
-            settings[3] &= ~(termios.ECHO | termios.ECHONL | termios.ICANON)
-            settings[6][termios.VMIN] = 1
-            settings[6][termios.VTIME] = 0
-            termios.tcsetattr(sys.stdin.fileno(), termios.TCSAFLUSH, settings)
-        sys.stdout.write("\033[?25l")
-        intro_timed_frame(['   /\\    /\\       /\\', '  /##\\  /  \\  ## /  \\',
-                           "  ||    ||   []    ||", "[DISPLAY] SYNC LOST"], 0.8)
-        intro_timed_frame(["#  []  ##   --   []", "   ##       #  #", "[DI$PLAY] -- --"], 0.12)
-        intro_timed_frame([], 0.7)
-        intro_timed_frame(["YOU DIED."], 1.2)
-        intro_timed_frame(["Just kidding."], 1.0)
-        intro_timed_frame(["Secret ending development in progress."], 1.0)
-    except (EOFError, KeyboardInterrupt):
-        raise SystemExit(0)
-    finally:
-        if saved is not None:
-            termios.tcsetattr(sys.stdin.fileno(), termios.TCSAFLUSH, saved)
-        sys.stdout.write("\033[?25h")
-        sys.stdout.flush()
-
+    show_intro_pages([
+        [
+            "SECRET ENDING | THE SIGNAL",
+            "",
+            "You leave the ship behind and follow the trail uphill.",
+            "The trees thin out. For the first time, your radio gets through.",
+            "",
+            "You send the crash coordinates and a warning:",
+            "  Two creatures at the wreck. Do not land nearby.",
+        ],
+        [
+            "[RADIO] MESSAGE RECEIVED",
+            "",
+            "A survey crew picks you up from the ridge at dawn.",
+            "Below you, the ship's beacon still blinks through the trees.",
+            "",
+            "You came here to fix a ship. All you could bring back",
+            "was a warning. Someone heard it.",
+        ],
+    ])

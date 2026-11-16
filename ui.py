@@ -11,6 +11,7 @@ MAP_COLORS = {
     "1": "93", "2": "93", "R": "93", "C": "93", "?": "93",
     ">": "92", "<": "92",
     "$": "95", "*": "95",
+    "G": "91", "H": "91", "g": "94", "h": "94", "X": "93",
 }
 
 def plain_map():
@@ -24,6 +25,11 @@ def player_icon():
     return "☺" if not plain_map() and encoding == "utf8" else "@"
 
 
+def color_symbol(text, symbol):
+    code = MAP_COLORS.get(symbol)
+    return f"\033[{code}m{text}\033[0m" if code else text
+
+
 def print_map(display, panel, show_floor):
     color = os.name == "posix" and bool(os.environ.get("TERM")) and not plain_map()
     icon = player_icon()
@@ -34,10 +40,13 @@ def print_map(display, panel, show_floor):
         side = panel[index].replace("@", icon) if index < len(panel) else ""
         tiles = f"{tiles:<60}"
         if color:
-            tiles = "".join(
-                f"\033[{MAP_COLORS[tile]}m{tile}\033[0m" if tile in MAP_COLORS else tile
-                for tile in tiles
-            )
+            tiles = "".join(color_symbol(tile, tile) for tile in tiles)
+            if side != "E Use  X Quit":
+                side = " ".join(
+                    color_symbol(token, token.strip("[]")) if token != "g/h"
+                    else color_symbol("g", "g") + "/" + color_symbol("h", "h")
+                    for token in side.split(" ")
+                )
         print(f"{tiles} {side}".rstrip())
 
 def print_dialogue(msg, width=78, max_lines=4):

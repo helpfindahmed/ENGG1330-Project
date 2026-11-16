@@ -30,8 +30,7 @@ navigation system finally identifies the planet as exceptionally dangerous.
 It is getting dark. Your immediate objective is to survive the forest and
 return to your ship. Once aboard, solve two connected engine puzzles and
 reach the reactor.
-Or you could try your luck and go deeper into the forest. That option exists 
-for a perfectly reasonable reason.
+An optional trail leads away from the wreck to a separate forest ending.
 
 *   Distinctive Features: A direct-pursuit Hunter and an intercepting Ghost,
     limited supplies, linked engine repairs, a secret exit, and terminal
@@ -39,8 +38,7 @@ for a perfectly reasonable reason.
 *   Completion: Repair both engines and resolve the reactor sequence. Its
     final explosion ends the game; attempting repair returns you to the
     decision after a scripted death. The secret exit in the forest provides
-    a separate ending. None of these endings rescues
-    the player.
+    a separate ending in which the player can survive.
 *   Playtime: The design target is approximately 5–10 minutes. Reading speed,
     puzzle retries, and repeated repair attempts affect the actual duration.
 
@@ -227,9 +225,8 @@ engine's result determines part of the lower engine's answer. The reactor
 checkpoint keeps that completed work in memory. There is no disk save, and
 restarting the program starts a new run.
 
-The secret forest branch is separate from the reactor choices. It plays a
-short glitch sequence, a false death, and a development-in-progress joke,
-then displays restart instructions. There is no additional playable forest.
+The optional forest trail leads to a separate ending. You leave the wreck
+behind, radio a warning, and are picked up from a ridge.
 
 ------------------------------------------------------
 8. CODE ORGANISATION AND CHECKS
@@ -309,8 +306,7 @@ above are reproducible from the project itself.
     Ship enemy updates still bypass the forest grace period explicitly.
 *   Some enemy warnings use interception language for the Hunter, although
     its actual target is the player's current position.
-*   The secret ending intentionally stops at a development-in-progress message.
-    There is no save/load system or automatic restart after an ending.
+*   There is no save/load system or automatic restart after an ending.
 *   Terminal rendering depends on an interactive terminal with ANSI support.
     Redirected input uses a line-based fallback, and UTF-8 player display has
     an ASCII fallback. The latest cinematic changes were not natively retested

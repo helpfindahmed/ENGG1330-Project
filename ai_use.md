@@ -488,3 +488,9 @@ Generative AI used: Yes
   story clarity. Retained both outcomes and the repair checkpoint. Tested
   starting a new game and choosing 2 directly, and choosing 1 then 2, in
   separate 80 by 24 macOS runs. Checked Backspace and the five ending pages.
+
+- Further follow-up on 16 November: Replaced the forest ending placeholder
+  with two readable story pages and matched the legend symbol colours to
+  the map. Playtested declining and accepting the forest exit, Backspace,
+  and quitting at the ending on macOS. Checked legend colour pairing,
+  80-column width, and plain rendering.

@@ -165,7 +165,7 @@ def run_forest_level():
             elif s["grid"][target_y][target_x] in (">", "<"):
                 ship_exit = s["grid"][target_y][target_x] == ">"
                 question = ("Make a run towards the ship?" if ship_exit
-                            else "Go deeper into the forest?")
+                            else "Leave the ship behind and follow the forest trail?")
                 if ship_exit and s["flash"] < MIN_BOARDING_BATTERY:
                     question = f"Battery low ({s['flash']}%). Board anyway? Choose No to recharge."
                 if not confirm_forest_exit(question):
@@ -176,8 +176,8 @@ def run_forest_level():
                     return True
                 else:
                     secret_ending()
-                    panel_answer(["Secret ending development in progress.", "",
-                                  "To restart, run this Python file again."],
+                    panel_answer(["THE END.", "", "You survived. The wreck was left behind.",
+                                  "To restart, run python3 main.py again."],
                                  "Press Enter to exit > ", 0)
                     return False
             else:
