@@ -27,9 +27,9 @@ An optional trail leads away from the wreck to a separate forest ending.
 *   Distinctive Features: A direct-pursuit Hunter and an intercepting Ghost,
     limited supplies, linked engine repairs, a secret exit, and terminal
     cinematics.
-*   Completion: Repair both engines and resolve the reactor sequence. Its
-    final explosion ends the game; attempting repair returns you to the
-    decision after a scripted death. The secret exit in the forest provides
+*   Completion: Repair both engines and prevent the creatures from escaping.
+    The reactor explosion completes that objective even though you do not
+    survive. Attempting repair returns you to the decision after a scripted death. The secret exit in the forest provides
     a separate ending in which the player can survive.
 *   Playtime: The design target is approximately 5–10 minutes. Reading speed,
     puzzle retries, and repeated repair attempts affect the actual duration.
@@ -215,8 +215,9 @@ supplies. The ship is dark, and the engines need more than encouragement.
 The two puzzles are connected by both a prerequisite and a clue: the upper
 engine's result determines part of the lower engine's answer. The reactor
 checkpoint keeps that completed work in memory. There is no disk save, and
-restarting the program starts a new run. A fatal outcome shows a
-YOU DIED screen with the cause and waits for Enter before exiting.
+restarting the program starts a new run. Death during play shows a YOU DIED
+screen. The main ending shows MISSION COMPLETE once the creatures are
+contained. Both screens explain how to restart and wait for Enter.
 
 The optional forest trail leads to a separate ending. You leave the wreck
 behind, radio a warning, and are picked up from a ridge.

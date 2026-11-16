@@ -27,8 +27,10 @@ def ship_objective():
         if not engine_fixed["engine_2"]:
             return "Enter the lower engine room [2] at the bottom of the deck."
         return "Reach the reactor room [R] on the left side of the deck."
-    if room == "reactor" and stage == "repair":
-        return "Return via < and repair both engines first."
+    if room == "reactor":
+        if stage == "repair":
+            return "Return via < and repair both engines first."
+        return "Use E at C to stop the creatures from escaping."
     if room in engine_fixed:
         if engine_fixed[room]:
             return "Engine repaired. Walk to < to return to the main deck."
@@ -370,7 +372,14 @@ def run_ship_level():
 
         if level_2_clear:
             explosion_animation()
-            show_death("You died in the reactor blast. The creatures did not escape.")
+            panel_answer([
+                "MISSION COMPLETE",
+                "",
+                "The creatures did not escape.",
+                "You did not survive the reactor blast.",
+                "",
+                "To restart, run python3 main.py again.",
+            ], "Press Enter to exit > ", max_length=0)
             break
 
         if action_taken and room == "ship" and enemies_active and not changed_map:

@@ -509,3 +509,8 @@ Generative AI used: Yes
   including the existing three ASCII crash panels. Kept the engineer setup
   and the goal of returning to the wreck. Checked page dimensions, Backspace,
   and a full macOS playthrough from New Game to the reactor ending.
+
+- Completion-screen follow-up on 16 November: Clarified the reactor-room
+  goal and added a distinct MISSION COMPLETE screen while retaining the
+  sacrifice ending. Checked both reactor choices and replayed the full
+  macOS route after the change.
