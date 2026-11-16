@@ -1,4 +1,4 @@
-# ENGG1330-Project
+# Blackout
 Subclass D, Group 4
 
 ======================================================
@@ -10,7 +10,7 @@ horror adventure played entirely in the terminal. Surviving the forest and the
 crashed ship requires route planning, resource management, and an understanding
 of how the two creatures track you. Repairing the ship is only part of the problem.
 
-Group members: 
+Group members: Hongkang Liu (Louis), Syed Ahnaf Akif, Ahmed Habib, and Dai Tianqi (Eric).
 
 Here is everything you need to know to survive long enough to finish.
 
@@ -29,8 +29,8 @@ An optional trail leads away from the wreck to a separate forest ending.
     cinematics.
 *   Completion: Repair both engines and prevent the creatures from escaping.
     The reactor explosion completes that objective even though you do not
-    survive. Attempting repair returns you to the decision after a scripted death. The secret exit in the forest provides
-    a separate ending in which the player can survive.
+    survive. Attempting repair returns you to the decision after a scripted
+    death. The forest trail provides a separate survival ending.
 *   Playtime: The design target is approximately 5–10 minutes. Reading speed,
     puzzle retries, and repeated repair attempts affect the actual duration.
 
@@ -42,9 +42,10 @@ Use Python 3 in an interactive terminal at least 80 columns wide and 24 rows
 high. The game uses only Python's standard library. It runs offline and needs
 no package installation, graphical window, audio device, or network connection.
 
-The course environment recorded in the testing log is Docker **v03**. Use the
-course-provided container and its launch instructions. Once inside the container, 
-change to the folder containing `main.py` and run exactly:
+The submission was tested in the course container
+`engg1330-project:2026-v03`. Extract the ZIP into the starter's shared
+`project` folder. Start a fresh course container and run this from the folder
+containing `main.py`:
 
 ```bash
 python3 main.py
@@ -72,9 +73,9 @@ renamed to `menus.py` so that imports resolve.
     To restart after an ending, run `python3 main.py` again in the container
     or use the same launch command you used locally.
 
-If the terminal becomes too small, resize it to at least 80 by 24. Gameplay
-may ask you to press Enter to resume. Narration and the three crash panels use Enter to advance and
-Backspace to revisit earlier pages.
+If the terminal drops below 80 by 24, the game pauses and asks you to resize.
+Restore the window and press Enter if prompted. Story pages, including crash
+and ending pages, use Enter to advance and Backspace to go back.
 
 ------------------------------------------------------
 3. CONTROLS AND TURN RULES
@@ -239,7 +240,7 @@ The modules separate the game's responsibilities:
 *   `turn_input.py`: Platform-specific turn input and paste handling.
 *   `ui.py`: Map display, bounded panel input, dialogue, and resize checks.
 *   `menus.py`: Main/debug menus, shop, manual, briefing, and confirmations.
-*   `cinematics.py`: Narration pagination, timed frames, and ending animations.
+*   `cinematics.py`: Opening, ASCII crash panels, and ending pages.
 
 From the project directory, perform a syntax check with:
 
@@ -263,31 +264,25 @@ is correct. Then launch `python3 main.py` in an 80 by 24 terminal and check:
    input, wrong settings, progressive hints, cancellation, and both repairs.
    Verify that the upper engine stops battery drain and both engines activate
    the creatures on the main deck.
-6. Reach the reactor, attempt repair twice, and check the checkpoint and
-   repeated-death dialogue. Choose to let the reactor fail and check the final sequence.
+6. Reach the reactor and try manual repair. Check that the checkpoint keeps
+   both repairs. Choose `Do nothing` and continue to `MISSION COMPLETE`.
 7. Repeat the final submission run in a fresh course v03 container offline.
    Restart by launching `main.py` again, rather than running a level module.
 
-Recorded checks:
+Recorded checks on the final game code:
 
-*   Louis's entries in `ai_use.md` report macOS, Windows, and Linux testing,
-    an earlier integrated build replayed in the offline course v03 container,
-    and a later ship-route check after the module split. Those results apply
-    to the versions identified in that log.
-*   Assistant-run checks on the latest uploaded modules passed syntax
-    compilation, shortest-path cases, Hunter speed thresholds, forest grace,
-    debug validation, help unlocking, and invalid-then-declined confirmation.
-    Reactor checks covered two repair deaths, repeated dialogue, choosing
-    to do nothing, and retained engine state.
-*   All 8 narration pages and 36 cinematic frame calls were checked against
-    the 72-column by 18-row text area inside the 80 by 24 screen. The pagination
-    repair was also checked for text preservation, page navigation, and resize
-    messages. These focused checks used isolated copies and simulated input;
-    they were not a new full-game Windows or course Docker run.
-
-The focused assistant checks were development checks outside the submitted
-modules, not an installed test framework. The syntax command and manual steps
-above are reproducible from the project itself.
+- Extracted the ZIP and ran from New Game to `MISSION COMPLETE` offline in a
+  fresh course v03 container. The eight-turn route used one recharge in the
+  forest and reached the upper engine with 25% battery. All 229 captured
+  gameplay screens fit 80 by 24.
+- Checked both engine puzzles, invalid commands, blocked movement, progressive
+  hints, the repair checkpoint, and restart. Shrinking the window while
+  waiting to move or aim immediately showed a resize warning. Restoring the
+  window and resuming consumed no turn, battery, or flash charge.
+- On macOS, checked the forest alternate ending, repeated firing and ammo
+  limits, trap recovery, invalid shop choices, and paste and arrow handling.
+  Earlier Windows and Ubuntu runs and later Windows input simulations are
+  recorded in `ai_use.md`.
 
 ------------------------------------------------------
 9. KNOWN LIMITATIONS
