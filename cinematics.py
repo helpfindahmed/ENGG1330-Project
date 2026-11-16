@@ -291,7 +291,7 @@ def intro_story():
     start = 0
     while index < len(frames):
         if index == 2:
-            for lines, delay in zip(crash_frames, (0.2, 0.2, 0.15)):
+            for lines, delay in zip(crash_frames, (0.4, 0.4, 0.3)):
                 intro_timed_frame(lines, delay)
             intro_timed_frame([], 0.45)
         if index == 4:
