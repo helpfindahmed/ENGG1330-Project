@@ -504,3 +504,8 @@ Generative AI used: Yes
 - Death screen follow-up on 16 November: Added a shared death screen with
   restart instructions. Verified by running out of battery in both levels
   and replaying the reactor repair checkpoint and explosion ending on macOS.
+
+- Opening follow-up on 16 November: Condensed the introduction to four pages,
+  including the existing three ASCII crash panels. Kept the engineer setup
+  and the goal of returning to the wreck. Checked page dimensions, Backspace,
+  and a full macOS playthrough from New Game to the reactor ending.

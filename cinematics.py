@@ -54,30 +54,6 @@ def _intro_key(interactive, ready, size):
         time.sleep(0.02)
     return ""
 
-def intro_steps(text):
-    """Paginate whole paragraphs within the 72-column, 18-row text area."""
-    pages = []
-    lines = []
-    for paragraph in text.split("\n\n"):
-        if not paragraph.strip():
-            continue
-        wrapped = []
-        for part in paragraph.splitlines():
-            wrapped.extend(textwrap.wrap(part, width=72) or [""])
-        if lines and len(lines) + 1 + len(wrapped) > 18:
-            pages.append(lines)
-            lines = []
-        # A paragraph longer than a screen must continue on another page.
-        while len(wrapped) > 18:
-            pages.append(wrapped[:18])
-            wrapped = wrapped[18:]
-        if lines:
-            lines.append("")
-        lines.extend(wrapped)
-    if lines:
-        pages.append(lines)
-    return pages or [[]]
-
 def show_intro_pages(pages):
     """Temporarily suppress input echo; always restore it before gameplay."""
     saved_input = None
@@ -128,121 +104,12 @@ def _navigate_story_pages(pages):
             index += 1
 
 def intro_story():
-    """narrative pages with Enter and Backspace navigation."""
-    frames = [
-        (
-            'You are a spacecraft systems engineer.\n'
-            '\n'
-            'Six years ago, “travel between planets” on your resume sounded like a perk.\n'
-            '\n'
-            'Your employer has since done a lot to correct that impression.\n'
-            '\n'
-            'Today, a mining plant has stopped working. The site manager '
-            'swears nobody touched anything.\n'
-            '\n'
-            'He has attached a photograph of a coolant regulator '
-            'installed backwards.\n'
-            '\n'
-            'You could explain this over a call, but they requested '
-            'an engineer. So now you have to go to another planet '
-            'and turn something around.\n'
-            '\n'
-            'Two hours’ pay. Travel not included.\n'
-            '\n'
-            'You accept the job. Rent remains annoyingly non-negotiable.'
-        ),
-        (
-            'You board the ship and prepare for the journey.\n'
-            '\n'
-            '[SYSTEMS] ALL SYSTEMS NOMINAL\n'
-            '\n'
-            '[NAVIGATION] UNSCHEDULED COURSE CORRECTION\n'
-            '\n'
-            '????\n'
-            '\n'
-            'You switch to manual control. The controls respond a second too '
-            'late.\n'
-            '\n'
-            'The navigation display jumps from one star chart to the next.\n'
-            '\n'
-            'The route eventually disappears, replaced by an unidentified planet '
-            'filling the window.\n'
-            '\n'
-            '[WARNING] ATMOSPHERIC ENTRY IMMINENT\n'
-            '\n'
-            'You fire the engines to slow your descent.\n'
-            'Below you, there is nothing but forest.'
-        ),
-        (
-            'You wake in the damaged cockpit and check the diagnostics.\n'
-            '\n'
-            '[ENGINES] OFFLINE\n'
-            '[THRUST REGULATOR] MISSING\n'
-            '[RADAR] COMPONENT SIGNAL DETECTED\n'
-            '\n'
-            'The regulator was thrown clear during the crash.\n'
-            'Without it, the ship cannot take off.\n'
-            '\n'
-            'Its signal is coming from the forest. You mark the ship’s '
-            'position, take your equipment, and follow the navigation arrow.'
-        ),
-        (
-            'You follow the signal between enormous trees, walking around '
-            'roots and fallen branches.\n'
-            '\n'
-            'Each detour takes you farther from the ship.\n'
-            '\n'
-            'The signal disappears.\n'
-            '\n'
-            '[ROUTE GUIDANCE] RECALCULATING\n'
-            '\n'
-            'You climb a slope to recover the signal. When you turn back, you cannot '
-            'find the path you came from.\n'
-            '\n'
-            'You check your recorded route.\n'
-            '\n'
-            '[RETURN TRACK] INCOMPLETE\n'
-            '\n'
-            'You try retracing your steps, but nothing looks familiar.'
-        ),
-        (
-            'Your handheld finally identifies the planet.\n'
-            '\n'
-            '[THREAT CLASSIFICATION] EXTREME\n'
-            '[EXPEDITION RECORDS] INCOMPLETE\n'
-            '[SPECIES] EXCEPTIONALLY DANGEROUS\n'
-            '[ACTIVITY] INCREASES AFTER NIGHTFALL\n'
-            '[YOUR POSITION] WITHIN THEIR TERRITORY\n'
-            '\n'
-            'The system waited until it was certain before warning you.\n'
-            '\n'
-            'You would have preferred a less reliable warning earlier.'
-        ),
-        (
-            'It is getting dark. You hear something moving behind the trees.\n'
-            '\n'
-            'You stop looking for the regulator.\n'
-            '\n'
-            'You are lost in the forest.\n'
-            '\n'
-            'You need to get back to the ship.\n'
-            '\n'
-            'The navigation system cannot tell you how.\n'
-            '\n'
-            'OBJECTIVE: REACH > ON THE RIGHT TO RETURN TO YOUR SHIP.'
-        ),
-        (
-            'You might be wondering why we narrated all of that instead of '
-            'letting you play through it.\n'
-            '\n'
-            '…\n'
-            '\n'
-            'Goodluck.'
-        ),
-    ]
+    """Show the assignment, the crash, and the first playable objective."""
     crash_frames = [
-        r'''[LANDING GEAR] JAMMED
+        r'''You are a ship engineer headed to repair a mining freighter.
+A navigation failure sends your ship down over a forest.
 
+[LANDING GEAR] JAMMED
                             : :           ENGINE PLUME
                          ___|=|___
                         /   | |   \
@@ -250,8 +117,6 @@ def intro_story():
                             | |
                             \ /
                              V            SHIP IN DESCENT
-
-
            /\                                  /\
           /__\    /\                    /\    /__\
       _____||____/__\__________________/__\____||_____
@@ -290,10 +155,18 @@ Engines offline. The ship is falling toward the trees.'''.splitlines(),
 
 The ship hits the ground. Flight recorder signal lost.'''.splitlines(),
     ]
-    pages = [page for scene in frames[:2] for page in intro_steps(scene)]
-    pages.extend(crash_frames)
-    pages.extend(page for scene in frames[2:] for page in intro_steps(scene))
-    show_intro_pages(pages)
+    aftermath = [
+        "AFTER THE CRASH",
+        "",
+        "Both engines are down. You take a flashlight and step outside",
+        "to check the damage. You lose sight of the wreck in the trees.",
+        "",
+        "Your handheld finally picks up the ship's beacon to the east.",
+        "Then you hear something moving nearby.",
+        "",
+        "Get back to the ship and restore power before dark.",
+    ]
+    show_intro_pages([*crash_frames, aftermath])
 
 
 def explosion_animation():

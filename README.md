@@ -18,18 +18,10 @@ Here is everything you need to know to survive long enough to finish.
 1. THE ASSIGNMENT: HOW YOU GOT HERE
 ------------------------------------------------------
 
-You are a spacecraft systems engineer, travelling between planets to fix
-problems someone else insists they did not cause.
-
-However, an unscheduled course correction sends your ship towards an unidentified
-planet. You crash in an enormous forest. Both engines are offline, and the
-ship's thrust regulator is missing. A maintenance signal leads you outside
-to look for it. Detours and unreliable navigation leave you lost before your
-navigation system finally identifies the planet as exceptionally dangerous.
-
-It is getting dark. Your immediate objective is to survive the forest and
-return to your ship. Once aboard, solve two connected engine puzzles and
-reach the reactor.
+You are a ship engineer on your way to repair a mining freighter. A navigation
+failure sends your ship into a forest. Both engines are down, and you lose
+sight of the wreck while checking the damage. Follow its beacon back to the
+ship, solve two connected engine puzzles, and reach the reactor.
 An optional trail leads away from the wreck to a separate forest ending.
 
 *   Distinctive Features: A direct-pursuit Hunter and an intercepting Ghost,
