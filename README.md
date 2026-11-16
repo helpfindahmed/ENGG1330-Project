@@ -370,6 +370,8 @@ above are reproducible from the project itself.
   and later added the 8-turn forest grace period and enemy stun timers.
 - Designed the custom `BLACKOUT` ASCII main menu (`menus.py`), and executed the full architectural 
   refactoring from a monolithic file into the final 11-module structure
+- Produced the complete demo including gameplay footage, explanation, explaining the code and 
+  finally the AI reflection (which was compiled by everyone)
 
 ### Dai Tianqi
 - Developed and integrated a complete in-game shop system in menu.py. Implemented the purchase process,
