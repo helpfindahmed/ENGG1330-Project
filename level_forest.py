@@ -3,7 +3,7 @@ from turn_input import PASTED_MOVE
 from cinematics import secret_ending
 from ui import print_map, print_dialogue, terminal_ready, panel_answer, read_map_turn, show_death
 from menus import enter_shop, open_terminal, show_forest_briefing, confirm_forest_exit
-from alien_logic import FOREST_GRACE_TURNS, alien_turn
+from alien_logic import alien_turn
 from state import s, alien_names, alien_stunned, shop_positions, open_tile, near_tile
 
 # The shortest route from the boarding point to the upper panel costs 43.
@@ -21,31 +21,22 @@ def draw(msg=""):
                 symbol = symbol.lower()
             display[y][x] = symbol
     print("LEVEL 1 - FOREST")
-    if s["battery_buys"]:
-        goal = "Reach > on the right to return to your ship."
-    elif s["coins"] >= 40:
-        goal = "Buy +50 battery at $ (stand beside it, press E, choose 1)."
-    else:
-        goal = "Collect four * (40 coins), then buy battery at $ before boarding."
-    print(f"Goal: {goal}")
-    grace_left = max(0, FOREST_GRACE_TURNS - s["turn"])
-    if grace_left:
-        print(f"Safe start: {grace_left} turns before the creatures move.")
+    print("Goal: Reach > on the right to return to your ship.")
     panel = [
         f"Flash: {s['flash']}%",
         f"Coins: {s['coins']}",
         f"Charges: {s['bangs']}",
         f"Traps: {s['traps']}",
+        "",
         "@ You  # Wall",
-        "? Help terminal (E)",
-        "$ Shop (E)  * Coin",
-        "> Ship  < Secret",
-        "G Ghost  H Hunter",
-        "g/h Stunned",
-        "X Armed trap",
-        "Blank = floor",
+        "> Ship exit",
+        "? Help  $ Shop",
+        "* Coins",
+        "WASD Move",
+        "E Use  X Quit",
+        "T Trap  F Flash",
     ]
-    print_map(display, panel, show_floor=False)
+    print_map(display, panel, show_floor=False, classic_colors=True)
     print_dialogue(msg)
 
 def run_forest_level():

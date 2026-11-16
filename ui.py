@@ -6,11 +6,14 @@ import textwrap
 from cinematics import intro_terminal_size, intro_draw, _intro_key
 from turn_input import TERMINAL_TOO_SMALL, posix_key_reader, read_turn
 
-MAP_COLORS = {
+CLASSIC_MAP_COLORS = {
     "@": "96", "☺": "96",
     "1": "93", "2": "93", "R": "93", "C": "93", "?": "93",
     ">": "92", "<": "92",
     "$": "95", "*": "95",
+}
+MAP_COLORS = {
+    **CLASSIC_MAP_COLORS,
     "G": "91", "H": "91", "g": "94", "h": "94", "X": "93",
 }
 
@@ -25,14 +28,15 @@ def player_icon():
     return "☺" if not plain_map() and encoding == "utf8" else "@"
 
 
-def color_symbol(text, symbol):
-    code = MAP_COLORS.get(symbol)
+def color_symbol(text, symbol, colors=MAP_COLORS):
+    code = colors.get(symbol)
     return f"\033[{code}m{text}\033[0m" if code else text
 
 
-def print_map(display, panel, show_floor):
+def print_map(display, panel, show_floor, *, classic_colors=False):
     color = os.name == "posix" and bool(os.environ.get("TERM")) and not plain_map()
     icon = player_icon()
+    colors = CLASSIC_MAP_COLORS if classic_colors else MAP_COLORS
     for index, row in enumerate(display):
         tiles = "".join(row).replace("@", icon)
         if not show_floor:
@@ -40,8 +44,8 @@ def print_map(display, panel, show_floor):
         side = panel[index].replace("@", icon) if index < len(panel) else ""
         tiles = f"{tiles:<60}"
         if color:
-            tiles = "".join(color_symbol(tile, tile) for tile in tiles)
-            if side != "E Use  X Quit":
+            tiles = "".join(color_symbol(tile, tile, colors) for tile in tiles)
+            if not classic_colors and side != "E Use  X Quit":
                 side = " ".join(
                     color_symbol(token, token.strip("[]")) if token != "g/h"
                     else color_symbol("g", "g") + "/" + color_symbol("h", "h")

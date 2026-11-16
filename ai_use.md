@@ -422,3 +422,8 @@ Generative AI used: Yes
 - Resize follow-up: Made movement and aiming pause immediately below 80 by 24.
   Checked idle resize and recovery without consuming a turn on macOS, and
   simulated the Windows input path.
+
+- Demo follow-up: Used Codex to draft voiceover lines for the updated intro
+  and reactor ending, and to restore the earlier forest HUD for visual
+  consistency with the trailer. Compared the HUD to the trailer footage and
+  tested progression through both engine puzzles and the ending on macOS.
