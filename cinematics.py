@@ -295,7 +295,7 @@ def intro_story():
           /__\    /\                    /\    /__\
       _____||____/__\__________________/__\____||_____
 
-[DESCENT] PULL UP'''.splitlines(),
+The landing gear will not deploy. Pull up!'''.splitlines(),
         r'''[WARNING] TERRAIN COLLISION IMMINENT
 
 
@@ -311,7 +311,7 @@ def intro_story():
           /__\    /\                    /\    /__\
       _____||____/__\__________________/__\____||_____
 
-[ENGINES] EMERGENCY SHUTDOWN'''.splitlines(),
+Engines offline. The ship is falling toward the trees.'''.splitlines(),
         r'''[CRITICAL] IMPACT DETECTED
 
 
@@ -327,7 +327,7 @@ def intro_story():
           /__\    /\    \    V    /     /\    /__\
       _____||____/__\____\__***__/_____/__\____||_____
 
-[FLIGHT RECORDER] SIGNAL LOST'''.splitlines(),
+The ship hits the ground. Flight recorder signal lost.'''.splitlines(),
     ]
     pages = [page for scene in frames[:2] for page in intro_steps(scene)]
     pages.extend(crash_frames)

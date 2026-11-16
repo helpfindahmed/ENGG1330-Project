@@ -104,11 +104,8 @@ both letters together, such as `FW`.
 *   X: Quit the current run.
 
 A successful move, fired attack, or placed trap can advance enemy behaviour.
-Blocked movement and invalid commands do not. Reopening help with H and
-declining an exit confirmation do not advance enemy movement. Using E at the 
-forest terminal or shop consumes an action after the menu closes, even if you 
-leave the shop without buying anything. 
-Read the prices before the creatures arrive.
+Blocked moves, invalid commands, reading help, using the forest shop, and
+declining an exit do not advance enemy movement.
 Interactive UTF-8 terminals show ☺ for the player, with cyan on supported
 macOS and Linux terminals. Plain terminals use @. Set `NO_COLOR=1` to request
 plain ASCII. On macOS, Linux, or inside the course container:
@@ -123,16 +120,12 @@ NO_COLOR=1 python3 main.py
 
 You are being hunted by two distinct entities:
 
-*   The Hunter (H): Pursues your exact current position using a shortest
-    walkable path. It takes two steps when its path distance from you is
-    greater than 8, and one step otherwise.
-*   The Ghost (G): Scores positions along a possible route from you to the
-    ship exit and tries to intercept you. It takes two steps when its path
-    distance from you is greater than 4, and one step otherwise. At very
-    close range it targets you directly.
-*   The Grace Period: Enemies do not move during the first 8 forest enemy-turn
-    updates. The eighth produces a warning; movement begins on the ninth.
-    Invalid keys and blocked attempts do not use up this grace period.
+*   The Hunter (H) uses a shortest walkable path to pursue your current position.
+*   The Ghost (G) scores positions along a route to the exit and tries to
+    intercept you. At very close range it targets you directly.
+*   In the forest, both creatures move at most one tile per turn after the
+    15-turn grace period. On the ship, the Ghost can move two tiles when its
+    path distance from you exceeds 4, and the Hunter when it exceeds 8.
 *   Aboard the Ship: There is no new grace period once enemies are active.
     They update after qualifying main-deck actions. They do not move inside
     engine rooms or the reactor, or on the action that changes rooms.
@@ -174,8 +167,8 @@ If battery reaches zero while the flashlight is required, the run ends.
     battery purchase count carry into the ship. Traps already placed in the
     forest do not follow you aboard.
 
-A shop visit completes at most one purchase. Opening a menu does not make the
-forest safe; the action can give the creatures another move when it closes.
+A shop visit completes at most one purchase. Buy a recharge before boarding.
+The exit warns you if there is too little battery to reach the first engine.
 
 ------------------------------------------------------
 6. COMBAT & DEFENSE

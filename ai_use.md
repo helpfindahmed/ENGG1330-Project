@@ -464,3 +464,21 @@ Generative AI used: Yes
   Rebuilt and ran the Docker container (`docker run --rm -it blackout-game`)
   and verified gameplay transitions from the main menu through the forest,
   ship engine repairs, and reactor ending.
+## Entry
+
+- Member and date: Hongkang Liu, 16 November 2026.
+- Tool and model/version: OpenAI Codex. Exact model version was not recorded.
+- Purpose: Improve the opening and forest after a first-time playtest exposed
+  unclear crash art, input rules, recharge guidance, and engine clues.
+- Substantial parts affected: `cinematics.py`, `menus.py`, `ui.py`,
+  `level_forest.py`, `alien_logic.py`, `level_ship.py`, `engine_puzzles.py`,
+  and the README.
+- What was kept, changed, or rejected: Used a consistent ship and treeline for
+  the crash panels, made the opening manually paged, and used direct keys for
+  menu choices. Added a longer forest grace period, slower forest enemies,
+  and clearer battery and map guidance. Kept the linked puzzle solutions.
+- How results were checked: Replayed New Game to the reactor ending on macOS
+  and offline in the course Docker v03 image. The updated forest route used
+  one recharge and no combat actions before boarding at 64% battery.
+  Verified the crash frame bounds, Backspace, both engine repairs, wrong
+  inputs, restart, and 231 gameplay screens at 80 by 24 in each run.

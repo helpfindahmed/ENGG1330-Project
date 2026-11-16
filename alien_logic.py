@@ -1,5 +1,7 @@
 from state import neighbors, shortest_distance, s, alien_names, alien_stunned, trap_at
 
+FOREST_GRACE_TURNS = 15
+
 def route(start, goal, blocked=()):
     queue = [start]
     previous = {start: None}
@@ -53,8 +55,9 @@ def alien_turn(protected=False, aggressive=False):
     warnings = []
     player = (s["px"], s["py"])
 
-    if not aggressive and s["turn"] <= 8:
-        if s["turn"] == 8: return "You hear something moving in the darkness..."
+    if not aggressive and s["turn"] <= FOREST_GRACE_TURNS:
+        if s["turn"] == FOREST_GRACE_TURNS:
+            return "The creatures are moving next turn. F then WASD aims a flash."
         return ""
 
     target = hunter_goal(player)
@@ -69,7 +72,7 @@ def alien_turn(protected=False, aggressive=False):
         goal = ghost_target if i == 0 else target
         distance_to_player = shortest_distance(here, player)
         sprint_limit = 4 if i == 0 else 8
-        steps = 2 if distance_to_player > sprint_limit else 1
+        steps = 2 if aggressive and distance_to_player > sprint_limit else 1
 
         for step in range(steps):
             here = tuple(s["aliens"][i])
@@ -84,10 +87,13 @@ def alien_turn(protected=False, aggressive=False):
             trap = trap_at(*chosen)
             if trap:
                 s["tl"].remove(trap)
+                x, y = chosen
+                if s["grid"][y][x] == "X":
+                    s["grid"][y][x] = "."
                 alien_stunned[i] = 3
                 warnings.append(alien_names[i] + " walked into your trap and is stunned!")
                 break
 
     if shortest_distance(tuple(s["aliens"][0]), player) <= 2: warnings.append("The Ghost is right behind you!")
-    if shortest_distance(tuple(s["aliens"][1]), player) <= 3: warnings.append("The Hunter is cutting off your path!")
+    if shortest_distance(tuple(s["aliens"][1]), player) <= 3: warnings.append("The Hunter is close. Flash it if you have a clear shot!")
     return " ".join(dict.fromkeys(warnings))

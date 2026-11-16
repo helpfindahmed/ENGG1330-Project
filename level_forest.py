@@ -3,8 +3,11 @@ from turn_input import PASTED_MOVE
 from cinematics import secret_ending
 from ui import print_map, print_dialogue, terminal_ready, panel_answer, read_map_turn
 from menus import enter_shop, open_terminal, show_forest_briefing, confirm_forest_exit
-from alien_logic import alien_turn
+from alien_logic import FOREST_GRACE_TURNS, alien_turn
 from state import s, alien_names, alien_stunned, shop_positions, open_tile, near_tile
+
+# The shortest route from the boarding point to the upper panel costs 43.
+MIN_BOARDING_BATTERY = 44
 
 def draw(msg=""):
     if not terminal_ready():
@@ -25,6 +28,9 @@ def draw(msg=""):
     else:
         goal = "Collect four * (40 coins), then buy battery at $ before boarding."
     print(f"Goal: {goal}")
+    grace_left = max(0, FOREST_GRACE_TURNS - s["turn"])
+    if grace_left:
+        print(f"Safe start: {grace_left} turns before the creatures move.")
     panel = [
         f"Flash: {s['flash']}%",
         f"Coins: {s['coins']}",
@@ -52,6 +58,10 @@ def run_forest_level():
     s["aliens"] = [[30, 8], [28, 2]]
     show_forest_briefing()
     draw("Move with WASD. Stand next to ? and press E for more help.")
+
+    def game_over(message):
+        draw(message + "\nRun python3 main.py again to restart.")
+        return False
 
     while True:
         target_x = s["px"]
@@ -96,10 +106,8 @@ def run_forest_level():
             if near_tile("?"):
                 open_terminal()
                 msg = "Manual closed."
-                action_taken = True
             elif near_tile("$"):
                 msg = enter_shop()
-                action_taken = True
             else:
                 msg = "Get closer to the shop ($) or terminal (?) first."
         elif len(move) == 2 and move[0] == "F":
@@ -158,6 +166,8 @@ def run_forest_level():
                 ship_exit = s["grid"][target_y][target_x] == ">"
                 question = ("Make a run towards the ship?" if ship_exit
                             else "Go deeper into the forest?")
+                if ship_exit and s["flash"] < MIN_BOARDING_BATTERY:
+                    question = f"Battery low ({s['flash']}%). Board anyway? Choose No to recharge."
                 if not confirm_forest_exit(question):
                     draw("You stay in the forest.")
                     continue
@@ -173,8 +183,7 @@ def run_forest_level():
             else:
                 if any((target_x, target_y) == tuple(g) and alien_stunned[i] == 0
                        for i, g in enumerate(s["aliens"])):
-                    draw("You walked straight into a creature. Game over.")
-                    return False
+                    return game_over("You walked into a creature. Game over.")
 
                 if s["grid"][target_y][target_x] == "X":
                     s["traps"] += 1
@@ -202,16 +211,14 @@ def run_forest_level():
                 s["flash"] -= 1
                 action_taken = True
                 if not msg and near_tile("$"):
-                    msg = "A mysterious store stands in the middle of the forest."
+                    msg = "Shop nearby. Press E beside $ for supplies."
 
         if s["flash"] <= 0:
-            draw("Game Over! your flashlight died.")
-            return False
+            return game_over("Your flashlight ran out. Game over.")
         if action_taken:
             danger = alien_turn(protected=trap_placed)
             if danger == "A creature caught you. Game Over!":
-                draw(danger)
-                return False
+                return game_over(danger)
             if danger:
                 msg = (msg + " " + danger).strip()
         draw(msg)
