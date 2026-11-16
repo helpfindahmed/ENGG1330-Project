@@ -18,20 +18,26 @@ def draw(msg=""):
                 symbol = symbol.lower()
             display[y][x] = symbol
     print("LEVEL 1 - FOREST")
-    print("Goal: Reach > on the right to return to your ship.")
+    if s["battery_buys"]:
+        goal = "Reach > on the right to return to your ship."
+    elif s["coins"] >= 40:
+        goal = "Buy +50 battery at $ (stand beside it, press E, choose 1)."
+    else:
+        goal = "Collect four * (40 coins), then buy battery at $ before boarding."
+    print(f"Goal: {goal}")
     panel = [
         f"Flash: {s['flash']}%",
         f"Coins: {s['coins']}",
         f"Charges: {s['bangs']}",
         f"Traps: {s['traps']}",
-        "",
         "@ You  # Wall",
-        "> Ship exit",
-        "? Help  $ Shop",
-        "* Coins",
-        "WASD Move",
-        "E Use  X Quit",
-        "T Trap  F Flash",
+        "? Help terminal (E)",
+        "$ Shop (E)  * Coin",
+        "> Ship  < Secret",
+        "G Ghost  H Hunter",
+        "g/h Stunned",
+        "X Armed trap",
+        "Blank = floor",
     ]
     print_map(display, panel, show_floor=False)
     print_dialogue(msg)
