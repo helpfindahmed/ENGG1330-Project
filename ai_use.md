@@ -500,3 +500,7 @@ Generative AI used: Yes
   Reproduced accidental menu selections before the fix. Rechecked the title
   and shop menus, repeated shooting, invalid movement input, and a full
   macOS run including both reactor choices.
+
+- Death screen follow-up on 16 November: Added a shared death screen with
+  restart instructions. Verified by running out of battery in both levels
+  and replaying the reactor repair checkpoint and explosion ending on macOS.

@@ -120,6 +120,14 @@ def panel_answer(lines, prompt="Setting > ", max_length=16, *, single_key=False)
         if saved is not None:
             termios.tcsetattr(sys.stdin.fileno(), termios.TCSANOW, saved)
 
+def show_death(reason):
+    panel_answer(
+        ["YOU DIED.", "", reason, "", "To restart, run python3 main.py again."],
+        "Press Enter to exit > ",
+        max_length=0,
+    )
+
+
 def read_map_turn(redraw):
     while True:
         if terminal_ready():

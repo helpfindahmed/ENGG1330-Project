@@ -1,7 +1,7 @@
 import os
 from turn_input import PASTED_MOVE
 from cinematics import secret_ending
-from ui import print_map, print_dialogue, terminal_ready, panel_answer, read_map_turn
+from ui import print_map, print_dialogue, terminal_ready, panel_answer, read_map_turn, show_death
 from menus import enter_shop, open_terminal, show_forest_briefing, confirm_forest_exit
 from alien_logic import FOREST_GRACE_TURNS, alien_turn
 from state import s, alien_names, alien_stunned, shop_positions, open_tile, near_tile
@@ -60,7 +60,7 @@ def run_forest_level():
     draw("Move with WASD. Stand next to ? and press E for more help.")
 
     def game_over(message):
-        draw(message + "\nRun python3 main.py again to restart.")
+        show_death(message)
         return False
 
     while True:
@@ -183,7 +183,7 @@ def run_forest_level():
             else:
                 if any((target_x, target_y) == tuple(g) and alien_stunned[i] == 0
                        for i, g in enumerate(s["aliens"])):
-                    return game_over("You walked into a creature. Game over.")
+                    return game_over("You walked into a creature.")
 
                 if s["grid"][target_y][target_x] == "X":
                     s["traps"] += 1
@@ -214,11 +214,11 @@ def run_forest_level():
                     msg = "Shop nearby. Press E beside $ for supplies."
 
         if s["flash"] <= 0:
-            return game_over("Your flashlight ran out. Game over.")
+            return game_over("Your flashlight ran out in the forest.")
         if action_taken:
             danger = alien_turn(protected=trap_placed)
             if danger == "A creature caught you. Game Over!":
-                return game_over(danger)
+                return game_over("A creature caught you in the forest.")
             if danger:
                 msg = (msg + " " + danger).strip()
         draw(msg)

@@ -4,7 +4,7 @@ from engine_puzzles import IGNITION_SLOT, PANEL_HINTS, panel_lines, solves_panel
 from turn_input import PASTED_MOVE
 from cinematics import explosion_animation, reactor_repair_animation
 from map_data import ship_map, engine_1_map, engine_2_map, reactor_map
-from ui import print_map, print_dialogue, terminal_ready, panel_answer, read_map_turn
+from ui import print_map, print_dialogue, terminal_ready, panel_answer, read_map_turn, show_death
 from menus import open_terminal
 from alien_logic import alien_turn
 from state import s, alien_names, alien_stunned, open_tile, near_tile
@@ -281,7 +281,7 @@ def run_ship_level():
                             caught = True
 
                 if caught:
-                    draw_level_2("You walked straight into a creature. Game Over.")
+                    show_death("You walked straight into a creature.")
                     break
 
                 if room == "ship":
@@ -370,21 +370,19 @@ def run_ship_level():
 
         if level_2_clear:
             explosion_animation()
-            panel_answer(["THE END.", "", "The creatures did not escape.",
-                          "To restart, run python3 main.py again."],
-                         "Press Enter to exit > ", 0)
+            show_death("You died in the reactor blast. The creatures did not escape.")
             break
 
         if action_taken and room == "ship" and enemies_active and not changed_map:
             danger = alien_turn(protected=trap_placed, aggressive=True)
             if danger == "A creature caught you. Game Over!":
-                draw_level_2("A creature caught you. Game Over!")
+                show_death("A creature caught you on the main deck.")
                 break
             if danger:
                 msg = (msg + "\n" + danger).strip()
 
         if s["flash"] <= 0 and not s["flashlight_disabled"]:
-            draw_level_2("Your flashlight died. The creatures take you in the dark. GAME OVER.")
+            show_death("Your flashlight ran out before the ship had power.")
             break
 
         draw_level_2(msg)

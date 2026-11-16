@@ -223,7 +223,8 @@ supplies. The ship is dark, and the engines need more than encouragement.
 The two puzzles are connected by both a prerequisite and a clue: the upper
 engine's result determines part of the lower engine's answer. The reactor
 checkpoint keeps that completed work in memory. There is no disk save, and
-restarting the program starts a new run.
+restarting the program starts a new run. A fatal outcome shows a
+YOU DIED screen with the cause and waits for Enter before exiting.
 
 The optional forest trail leads to a separate ending. You leave the wreck
 behind, radio a warning, and are picked up from a ridge.
