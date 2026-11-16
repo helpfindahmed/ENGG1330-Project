@@ -1,4 +1,5 @@
 # Pull the main game state dictionary so the shop can deduct coins and add items
+from alien_logic import FOREST_GRACE_TURNS
 from state import s
 
 # Pull the rendering tools the menus need to display text
@@ -119,7 +120,7 @@ def show_forest_briefing():
         "WASD moves one tile. # is a wall; blank spaces are floor.",
         "? is the yellow help terminal: stand beside it and press E.",
         "H reopens the manual. < is an optional exit.",
-        "The creatures stay still for the first 15 turns."
+        f"The creatures stay still for the first {FOREST_GRACE_TURNS} turns."
         "",
         "Press T to drop a trap. Move off it to arm it.",
         "Press F, then a direction key, to fire a flash.",

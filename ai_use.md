@@ -415,3 +415,6 @@ Generative AI used: Yes
 - Substantial parts affected: `cinematics.py`, `menus.py`, `ui.py`, `turn_input.py`, `level_forest.py`, `alien_logic.py`, `level_ship.py`, `engine_puzzles.py` and README.
 - What was kept, changed, or rejected: Shortened the opening, improved controls and forest balance, clarified the fuel puzzle, and revised the endings, death screens and mission-complete screen.
 - How results were checked: Tested the full route, both reactor choices, the forest ending and invalid input on macOS. Ran the final gameplay ZIP offline in course Docker at 80 by 24.
+
+- Final balance check: Restored the eight-turn forest grace period and verified
+  a recharge route through both repairs and MISSION COMPLETE in course Docker.

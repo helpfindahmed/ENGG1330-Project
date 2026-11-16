@@ -1,6 +1,6 @@
 from state import neighbors, shortest_distance, s, alien_names, alien_stunned, trap_at
 
-FOREST_GRACE_TURNS = 15
+FOREST_GRACE_TURNS = 8
 
 def route(start, goal, blocked=()):
     queue = [start]

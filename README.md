@@ -114,7 +114,7 @@ You are being hunted by two distinct entities:
 *   The Ghost (G) scores positions along a route to the exit and tries to
     intercept you. At very close range it targets you directly.
 *   In the forest, both creatures move at most one tile per turn after the
-    15-turn grace period. On the ship, the Ghost can move two tiles when its
+    8-turn grace period. On the ship, the Ghost can move two tiles when its
     path distance from you exceeds 4, and the Hunter when it exceeds 8.
 *   Aboard the Ship: There is no new grace period once enemies are active.
     They update after qualifying main-deck actions. They do not move inside
